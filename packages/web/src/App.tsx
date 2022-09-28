@@ -1,5 +1,9 @@
-function App() {
-  return <div>Hello World</div>;
-}
+import { Providers } from './providers';
 
-export default App;
+export function App() {
+  return (
+    <Providers>
+      <div>Hello World</div>
+    </Providers>
+  );
+}
