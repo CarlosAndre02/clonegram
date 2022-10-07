@@ -1,0 +1,9 @@
+"""The root of all queries"""
+type Query {
+  hello_world: String
+}
+
+"""The root of all mutations"""
+type Mutation {
+  hello_world: String
+}

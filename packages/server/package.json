@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "dev": "nodemon",
-    "start": "yarn build && node dist/index.js"
+    "start": "yarn build && node dist/index.js",
+    "schema": "ts-node scripts/updateSchema.ts"
   },
   "devDependencies": {
     "@types/koa": "^2.13.5",
