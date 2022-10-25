@@ -23,6 +23,7 @@
     "dotenv": "^16.0.3",
     "graphql": "^16.6.0",
     "graphql-helix": "^1.13.0",
+    "graphql-relay": "^0.10.0",
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "mongoose": "^6.6.5"

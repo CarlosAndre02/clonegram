@@ -4334,6 +4334,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graphql-relay@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "graphql-relay@npm:0.10.0"
+  peerDependencies:
+    graphql: ^16.2.0
+  checksum: 74b2b608ed7c18cc405d53fa7e482a68442a4dc7c0748bba029c59e1d23c6c6e5b8193c775eb73f6bb0dce49501f66af0453eb0b0f0362374cef9f97528852c0
+  languageName: node
+  linkType: hard
+
 "graphql@npm:15.3.0":
   version: 15.3.0
   resolution: "graphql@npm:15.3.0"
@@ -6390,6 +6399,7 @@ __metadata:
     dotenv: ^16.0.3
     graphql: ^16.6.0
     graphql-helix: ^1.13.0
+    graphql-relay: ^0.10.0
     koa: ^2.13.4
     koa-bodyparser: ^4.3.0
     mongoose: ^6.6.5
