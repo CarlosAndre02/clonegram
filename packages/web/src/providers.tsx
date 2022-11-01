@@ -1,7 +1,9 @@
 import { ReactNode } from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
-import { theme } from './theme';
 import { RelayEnvironmentProvider } from 'react-relay';
+import { ChakraProvider } from '@chakra-ui/react';
+import { BrowserRouter } from 'react-router-dom';
+
+import { theme } from './theme';
 import { RelayEnvironment } from './RelayEnvironment';
 
 type ProvidersProps = {
@@ -11,7 +13,9 @@ type ProvidersProps = {
 export const Providers = ({ children }: ProvidersProps) => {
   return (
     <RelayEnvironmentProvider environment={RelayEnvironment}>
-      <ChakraProvider theme={theme}>{children}</ChakraProvider>
+      <BrowserRouter>
+        <ChakraProvider theme={theme}>{children}</ChakraProvider>
+      </BrowserRouter>
     </RelayEnvironmentProvider>
   );
 };
