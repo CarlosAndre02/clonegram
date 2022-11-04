@@ -1,9 +1,15 @@
-import { Providers } from './providers';
+import { Suspense } from 'react';
+import { Spinner } from '@chakra-ui/react';
+
+import { Providers } from '@/providers';
+import { AppRoutes } from '@/Routes';
 
 export function App() {
   return (
-    <Providers>
-      <div>Hello World</div>
-    </Providers>
+    <Suspense fallback={<Spinner />}>
+      <Providers>
+        <AppRoutes />
+      </Providers>
+    </Suspense>
   );
 }
