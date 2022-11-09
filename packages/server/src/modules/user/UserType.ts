@@ -16,7 +16,7 @@ import {
   registerTypeLoader,
   nodeInterface
 } from '@/modules/graphql/typeRegister';
-import { load } from './UserLoader';
+import UserLoader, { load } from './UserLoader';
 import { GraphQLContext } from '@/modules/graphql/types';
 
 export const UserType = new GraphQLObjectType({
@@ -49,7 +49,6 @@ export const UserType = new GraphQLObjectType({
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
       resolve: (user, args, context: GraphQLContext) => {
-        const { UserLoader } = context.dataloaders;
         return UserLoader.loadAll(
           context,
           withFilter(args, { _id: { $in: user.followers } })
@@ -60,7 +59,6 @@ export const UserType = new GraphQLObjectType({
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
       resolve: (user, args, context: GraphQLContext) => {
-        const { UserLoader } = context.dataloaders;
         return UserLoader.loadAll(
           context,
           withFilter(args, { _id: { $in: user.following } })
