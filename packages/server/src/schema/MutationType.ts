@@ -1,12 +1,11 @@
-import { GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLObjectType } from 'graphql';
+
+import * as userMutations from '@/modules/user/mutations';
 
 export const MutationType = new GraphQLObjectType({
   name: 'Mutation',
   description: 'The root of all mutations',
-  fields: {
-    hello_world: {
-      type: GraphQLString,
-      resolve: () => 'Hello world from mutation'
-    }
-  }
+  fields: () => ({
+    ...userMutations
+  })
 });
