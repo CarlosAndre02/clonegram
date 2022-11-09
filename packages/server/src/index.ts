@@ -1,3 +1,4 @@
+import './config/module-alias';
 import app from './server';
 import { config } from './config/env';
 import { initDB } from './config/database';
