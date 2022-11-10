@@ -12,13 +12,19 @@ import {
 import { Field, Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useCallback, useState } from 'react';
+import { useMutation } from 'react-relay';
+import { useNavigate } from 'react-router-dom';
 
 import clonegramLogo from '@/assets/clonegram-logo.png';
 import { ErrorMessage } from '@/shared/ErrorMessage';
+import { SignupMutation as SignupMutationType } from '../mutations/__generated__/SignupMutation.graphql';
+import { SignupMutation } from '../mutations/SignupMutation';
 
 export default function SignupPage() {
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const [commitSignup, isMutationLoading] =
+    useMutation<SignupMutationType>(SignupMutation);
 
   const formik = useFormik({
     initialValues: {
@@ -41,10 +47,26 @@ export default function SignupPage() {
         .required('Senha é obrigatório')
     }),
     onSubmit: (values) => {
-      // TODO: implement submit feature
-      setIsLoading(true);
-      console.log(values);
-      setIsLoading(false);
+      commitSignup({
+        variables: {
+          input: {
+            ...values
+          }
+        },
+        onCompleted: ({ CreateUserMutation }) => {
+          if (CreateUserMutation?.error) {
+            setError(CreateUserMutation?.error);
+            return;
+          }
+
+          // TODO: SignIn user
+
+          navigate(`/${CreateUserMutation?.user?.username}`);
+        },
+        onError: () => {
+          setError('Um erro inesperado aconteceu. Tente novamente');
+        }
+      });
     }
   });
 
@@ -114,7 +136,7 @@ export default function SignupPage() {
               bg="#0095f6"
               color="white"
               size="sm"
-              isLoading={isLoading}
+              isLoading={isMutationLoading}
               _hover={{ bg: '#4db5f9' }}
             >
               Cadastre-se
