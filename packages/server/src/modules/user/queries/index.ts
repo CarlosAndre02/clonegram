@@ -1,2 +1,2 @@
 export * from './MeQuery';
-export * from './GetUserQuery';
+export * from './UserGetQuery';
