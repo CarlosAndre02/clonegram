@@ -11,23 +11,14 @@ type Query {
     """The IDs of objects"""
     ids: [ID!]!
   ): [Node]!
+  me: User
+  GetUserQuery(username: String!): User
 }
 
 """An object with an ID"""
 interface Node {
   """The id of the object."""
   id: ID!
-}
-
-"""The root of all mutations"""
-type Mutation {
-  CreateUserMutation(input: CreateUserInput!): CreateUserPayload
-}
-
-type CreateUserPayload {
-  user: User
-  error: String
-  clientMutationId: String
 }
 
 """User data"""
@@ -117,6 +108,17 @@ type UserEdge {
 
   """A cursor for use in pagination."""
   cursor: String!
+}
+
+"""The root of all mutations"""
+type Mutation {
+  CreateUserMutation(input: CreateUserInput!): CreateUserPayload
+}
+
+type CreateUserPayload {
+  user: User
+  error: String
+  clientMutationId: String
 }
 
 input CreateUserInput {
