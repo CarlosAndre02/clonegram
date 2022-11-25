@@ -46,11 +46,12 @@ export default function SignupPage() {
         .min(8, 'Senha deve ter pelo menos 8 caracteres')
         .required('Senha é obrigatório')
     }),
-    onSubmit: (values) => {
+    onSubmit: ({ fullname, ...rest }) => {
       commitSignup({
         variables: {
           input: {
-            ...values
+            fullname: fullname || null,
+            ...rest
           }
         },
         onCompleted: ({ CreateUserMutation }) => {
