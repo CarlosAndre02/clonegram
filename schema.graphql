@@ -113,6 +113,7 @@ type UserEdge {
 """The root of all mutations"""
 type Mutation {
   CreateUserMutation(input: CreateUserInput!): CreateUserPayload
+  UserUpdateMutation(input: UpdateUserInput!): UpdateUserPayload
 }
 
 type CreateUserPayload {
@@ -126,5 +127,18 @@ input CreateUserInput {
   fullname: String
   username: String!
   password: String!
+  clientMutationId: String
+}
+
+type UpdateUserPayload {
+  user: User
+  error: String
+  clientMutationId: String
+}
+
+input UpdateUserInput {
+  id: ID!
+  fullname: String!
+  biography: String!
   clientMutationId: String
 }
