@@ -12,10 +12,10 @@ export const UserUpdateMutation = mutationWithClientMutationId({
       type: new GraphQLNonNull(GraphQLID)
     },
     fullname: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     },
     biography: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: GraphQLString
     }
   },
   mutateAndGetPayload: async (
