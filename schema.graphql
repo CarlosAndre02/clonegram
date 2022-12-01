@@ -138,7 +138,7 @@ type UpdateUserPayload {
 
 input UpdateUserInput {
   id: ID!
-  fullname: String!
-  biography: String!
+  fullname: String
+  biography: String
   clientMutationId: String
 }
