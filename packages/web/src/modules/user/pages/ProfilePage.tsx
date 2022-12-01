@@ -101,9 +101,13 @@ export default function ProfilePage() {
             </HStack>
 
             {!!GetUserQuery.fullname && (
-              <Text fontWeight="semibold">{GetUserQuery.fullname}</Text>
+              <Text fontWeight="semibold" wordBreak="break-word">
+                {GetUserQuery.fullname}
+              </Text>
             )}
-            {!!GetUserQuery.biography && <Text>{GetUserQuery.biography}</Text>}
+            {!!GetUserQuery.biography && (
+              <Text wordBreak="break-word">{GetUserQuery.biography}</Text>
+            )}
           </Flex>
           {/* <Divider borderColor="lightgray" /> */}
         </Flex>
