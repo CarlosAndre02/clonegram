@@ -12,7 +12,6 @@ import {
 import * as Yup from 'yup';
 import { Field, Form, FormikProvider, useFormik } from 'formik';
 import { useLazyLoadQuery, useMutation } from 'react-relay';
-import { useState } from 'react';
 
 import { UserEditGetQuery } from '../queries/UserEditGetQuery';
 import { UserEditGetQuery as UserEditGetQueryType } from '../queries/__generated__/UserEditGetQuery.graphql';
@@ -28,16 +27,13 @@ export default function ProfileEditPage() {
       username: username ?? ''
     }
   );
-  // not sure about this
-  const [fullname, setFullname] = useState(GetUserQuery?.fullname ?? '');
-  const [biography, setBiography] = useState(GetUserQuery?.biography ?? '');
   const [commitUserUpdate, isMutationLoading] =
     useMutation<UserUpdateMutationType>(UserUpdateMutation);
 
   const formik = useFormik({
     initialValues: {
-      fullname: fullname,
-      biography: biography
+      fullname: GetUserQuery?.fullname ?? '',
+      biography: GetUserQuery?.biography ?? ''
     },
     validationSchema: Yup.object().shape({
       fullname: Yup.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
@@ -66,9 +62,8 @@ export default function ProfileEditPage() {
             return;
           }
 
-          setFullname(UserUpdateMutation?.user?.fullname ?? '');
-          setBiography(UserUpdateMutation?.user?.biography ?? '');
-
+          formik.values.fullname = UserUpdateMutation?.user?.fullname ?? '';
+          formik.values.biography = UserUpdateMutation?.user?.biography ?? '';
           toast({
             title: 'Informações salvas.',
             status: 'success',
