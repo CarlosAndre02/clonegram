@@ -40,7 +40,10 @@ export const UserType = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (user) => user.biography
     },
-    // TODO: Implement Avatar field
+    avatarUrl: {
+      type: GraphQLString,
+      resolve: (user) => user.avatarUrl
+    },
     // posts: {
 
     // }

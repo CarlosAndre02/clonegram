@@ -5,6 +5,7 @@ export type UserDocument = Document & {
   fullname?: string;
   username: string;
   email: string;
+  avatarUrl?: string;
   biography?: string;
   password: string;
   following: Types.ObjectId[];
@@ -32,7 +33,9 @@ const UserSchema = new Schema(
       required: true,
       unique: true
     },
-    // TODO: Implement avatar field
+    avatarUrl: {
+      type: String
+    },
     biography: {
       type: String
     },
