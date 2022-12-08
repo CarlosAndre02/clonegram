@@ -9,5 +9,5 @@ export const initDB = async () => {
     .on('close', () => console.log('Database connection was closed!'));
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await mongoose.connect(config.MONGO_URI!, { dbName: 'Clonegram' });
+  await mongoose.connect(config.MONGO_URI!);
 };
