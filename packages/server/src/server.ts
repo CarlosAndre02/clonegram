@@ -8,6 +8,7 @@ import {
   sendResult,
   shouldRenderGraphiQL
 } from 'graphql-helix';
+import { graphqlUploadKoa } from 'graphql-upload-cjs';
 
 import { schema } from './schema/schema';
 
@@ -15,6 +16,8 @@ const app = new Koa();
 
 app.use(bodyparser());
 app.use(cors());
+
+app.use(graphqlUploadKoa({ maxFileSize: 10000000, maxFiles: 10 }));
 
 app.use(async (ctx) => {
   const request = {

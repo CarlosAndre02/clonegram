@@ -2,9 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es2016",
-    "module": "commonjs",
+    "module": "node16",
     "rootDir": "src",
     "resolveJsonModule": true,
+    "maxNodeModuleJsDepth": 10,
     "allowJs": true,
     "outDir": "dist",
     "esModuleInterop": true,
