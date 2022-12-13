@@ -7,26 +7,32 @@ import {
   Text,
   Flex,
   Textarea,
-  useToast
+  useToast,
+  Avatar,
+  HStack,
+  Box,
+  useDisclosure
 } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { Field, Form, FormikProvider, useFormik } from 'formik';
 import { useLazyLoadQuery, useMutation } from 'react-relay';
 
-import { UserEditGetQuery } from '../queries/UserEditGetQuery';
-import { UserEditGetQuery as UserEditGetQueryType } from '../queries/__generated__/UserEditGetQuery.graphql';
-import { UserUpdateMutation as UserUpdateMutationType } from '../mutations/__generated__/UserUpdateMutation.graphql';
-import { UserUpdateMutation } from '../mutations/UserUpdateMutation';
+import { ProfileEditGetQuery } from '../../queries/ProfileEditGetQuery';
+import { ProfileEditGetQuery as ProfileEditGetQueryType } from '../../queries/__generated__/ProfileEditGetQuery.graphql';
+import { UserUpdateMutation } from '../../mutations/UserUpdateMutation';
+import { UserUpdateMutation as UserUpdateMutationType } from '../../mutations/__generated__/UserUpdateMutation.graphql';
+import { AvatarUploadModal } from './AvatarUploadModal';
 
 export default function ProfileEditPage() {
-  const toast = useToast();
   const username = 'messi123'; // TODO: This username should come from logged user
-  const { GetUserQuery } = useLazyLoadQuery<UserEditGetQueryType>(
-    UserEditGetQuery,
+  const { GetUserQuery } = useLazyLoadQuery<ProfileEditGetQueryType>(
+    ProfileEditGetQuery,
     {
       username: username ?? ''
     }
   );
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [commitUserUpdate, isMutationLoading] =
     useMutation<UserUpdateMutationType>(UserUpdateMutation);
 
@@ -62,8 +68,14 @@ export default function ProfileEditPage() {
             return;
           }
 
-          formik.values.fullname = UserUpdateMutation?.user?.fullname ?? '';
-          formik.values.biography = UserUpdateMutation?.user?.biography ?? '';
+          formik.setFieldValue(
+            'fullname',
+            UserUpdateMutation?.user?.fullname ?? ''
+          );
+          formik.setFieldValue(
+            'biography',
+            UserUpdateMutation?.user?.biography ?? ''
+          );
           toast({
             title: 'Informações salvas.',
             status: 'success',
@@ -96,7 +108,44 @@ export default function ProfileEditPage() {
       <FormikProvider value={formik}>
         <Form>
           <Flex direction="column">
-            <Flex direction={{ base: 'column', md: 'row' }}>
+            <HStack mb="25px" spacing="0">
+              <Flex
+                w={{ base: 'max-content', md: '84px' }}
+                mr="37px"
+                justify="flex-end"
+                align="flex-start"
+              >
+                <Avatar
+                  w="38px"
+                  h="38px"
+                  bg="lightgrey"
+                  src={GetUserQuery?.avatarUrl ?? undefined}
+                />
+              </Flex>
+              <Box>
+                <Text wordBreak="break-word">{GetUserQuery?.username}</Text>
+                <Button
+                  h="max-content"
+                  m="0"
+                  p="0"
+                  fontSize="13px"
+                  bg="transparent"
+                  color="#0095f6"
+                  _hover={{ bg: 'initial', color: '#1c1e21' }}
+                  _active={{ color: 'grey' }}
+                  onClick={onOpen}
+                >
+                  Alterar foto do perfil
+                </Button>
+                <AvatarUploadModal
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  userId={GetUserQuery?.id ?? ''}
+                  hasAvatar={!!GetUserQuery?.avatarUrl}
+                />
+              </Box>
+            </HStack>
+            <Flex direction={{ base: 'column', md: 'row' }} mb="25px">
               <Flex
                 w={{ base: 'max-content', md: '100px' }}
                 mr="35px"
@@ -127,7 +176,7 @@ export default function ProfileEditPage() {
                 <FormErrorMessage>{formik.errors.fullname}</FormErrorMessage>
               </FormControl>
             </Flex>
-            <Flex direction={{ base: 'column', md: 'row' }} mt="25px">
+            <Flex direction={{ base: 'column', md: 'row' }}>
               <Flex
                 w={{ base: 'max-content', md: '100px' }}
                 mr="35px"

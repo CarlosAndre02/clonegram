@@ -1,11 +1,13 @@
 import { graphql } from 'react-relay';
 
-export const UserEditGetQuery = graphql`
-  query UserEditGetQuery($username: String!) {
+export const ProfileEditGetQuery = graphql`
+  query ProfileEditGetQuery($username: String!) {
     GetUserQuery(username: $username) {
       id
+      username
       fullname
       biography
+      avatarUrl
     }
   }
 `;
