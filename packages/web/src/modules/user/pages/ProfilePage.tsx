@@ -11,14 +11,17 @@ import {
 import { useLazyLoadQuery } from 'react-relay';
 import { useParams } from 'react-router-dom';
 
-import { UserGetQuery } from '../queries/UserGetQuery';
-import { UserGetQuery as UserGetQueryType } from '../queries/__generated__/UserGetQuery.graphql';
+import { ProfileGetQuery } from '../queries/ProfileGetQuery';
+import { ProfileGetQuery as ProfileGetQueryType } from '../queries/__generated__/ProfileGetQuery.graphql';
 
 export default function ProfilePage() {
   const { username } = useParams();
-  const { GetUserQuery } = useLazyLoadQuery<UserGetQueryType>(UserGetQuery, {
-    username: username ?? ''
-  });
+  const { GetUserQuery } = useLazyLoadQuery<ProfileGetQueryType>(
+    ProfileGetQuery,
+    {
+      username: username ?? ''
+    }
+  );
 
   return (
     <Container maxW="870px" p="unset">
@@ -28,7 +31,7 @@ export default function ProfilePage() {
             <Avatar
               w={{ base: '100px', md: '160px' }}
               h={{ base: '100px', md: '160px' }}
-              src={undefined}
+              src={GetUserQuery.avatarUrl || undefined}
             />
           </Center>
           <Flex direction="column">
