@@ -5,7 +5,10 @@ export type UserDocument = Document & {
   fullname?: string;
   username: string;
   email: string;
-  avatarUrl?: string;
+  avatar?: {
+    key: string;
+    url: string;
+  };
   biography?: string;
   password: string;
   following: Types.ObjectId[];
@@ -33,8 +36,13 @@ const UserSchema = new Schema(
       required: true,
       unique: true
     },
-    avatarUrl: {
-      type: String
+    avatar: {
+      key: {
+        type: String
+      },
+      url: {
+        type: String
+      }
     },
     biography: {
       type: String

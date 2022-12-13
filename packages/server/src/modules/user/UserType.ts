@@ -42,7 +42,7 @@ export const UserType = new GraphQLObjectType({
     },
     avatarUrl: {
       type: GraphQLString,
-      resolve: (user) => user.avatarUrl
+      resolve: (user) => user.avatar?.url
     },
     // posts: {
 
