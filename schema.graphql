@@ -29,6 +29,7 @@ type User implements Node {
   username: String!
   email: String!
   biography: String
+  avatarUrl: String
   followers(after: String, first: Int, before: String, last: Int): UserConnection!
   following(after: String, first: Int, before: String, last: Int): UserConnection!
   followers_count: Int!
@@ -114,6 +115,12 @@ type UserEdge {
 type Mutation {
   CreateUserMutation(input: CreateUserInput!): CreateUserPayload
   UserUpdateMutation(input: UpdateUserInput!): UpdateUserPayload
+
+  """Create or update user avatar"""
+  UserAvatarUpdateMutation(input: UpdateUserAvatarInput!): UpdateUserAvatarPayload
+
+  """Delete user avatar"""
+  UserAvatarDeleteMutation(input: DeleteUserAvatarInput!): DeleteUserAvatarPayload
 }
 
 type CreateUserPayload {
@@ -140,5 +147,31 @@ input UpdateUserInput {
   id: ID!
   fullname: String
   biography: String
+  clientMutationId: String
+}
+
+type UpdateUserAvatarPayload {
+  user: User
+  error: String
+  clientMutationId: String
+}
+
+input UpdateUserAvatarInput {
+  id: ID!
+  file: Upload
+  clientMutationId: String
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type DeleteUserAvatarPayload {
+  user: User
+  error: String
+  clientMutationId: String
+}
+
+input DeleteUserAvatarInput {
+  id: ID!
   clientMutationId: String
 }

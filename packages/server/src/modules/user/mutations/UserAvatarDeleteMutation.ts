@@ -4,6 +4,7 @@ import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 import { UserModel } from '../UserModel';
 import { GraphQLContext } from '@/modules/graphql/types';
 import { deleteObjectFromS3 } from '@/services/S3Service';
+import { UserType } from '../UserType';
 
 export const UserAvatarDeleteMutation = mutationWithClientMutationId({
   name: 'DeleteUserAvatar',
@@ -31,26 +32,26 @@ export const UserAvatarDeleteMutation = mutationWithClientMutationId({
     const user = await UserModel.findOne({ _id: userId });
     if (!user) return { error: 'This user does not exist' };
 
-    if (!user.avatarUrl) {
+    if (!user.avatar) {
       return { error: 'There is no avatar to delete' };
     }
 
-    await deleteObjectFromS3(`avatar/${user._id}`);
+    await deleteObjectFromS3(user.avatar.key);
     const userUpdated = await UserModel.findOneAndUpdate(
       { _id: userId },
-      { $set: { avatarUrl: null } },
+      { $set: { avatar: null } },
       { new: true }
     );
 
     return {
-      avatarUrl: userUpdated?.avatarUrl,
+      user: userUpdated,
       error: null
     };
   },
   outputFields: {
-    avatarUrl: {
-      type: GraphQLString,
-      resolve: ({ avatarUrl }) => avatarUrl
+    user: {
+      type: UserType,
+      resolve: ({ user }) => user
     },
     error: {
       type: GraphQLString,

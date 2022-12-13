@@ -1,10 +1,12 @@
 import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql';
 import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 import { GraphQLUpload } from 'graphql-upload-cjs';
+import crypto from 'crypto';
 
 import { UserModel } from '../UserModel';
 import { GraphQLContext } from '@/modules/graphql/types';
 import { uploadObjectToS3, deleteObjectFromS3 } from '@/services/S3Service';
+import { UserType } from '../UserType';
 
 export const UserAvatarUpdateMutation = mutationWithClientMutationId({
   name: 'UpdateUserAvatar',
@@ -14,7 +16,7 @@ export const UserAvatarUpdateMutation = mutationWithClientMutationId({
       type: new GraphQLNonNull(GraphQLID)
     },
     file: {
-      type: new GraphQLNonNull(GraphQLUpload)
+      type: GraphQLUpload
     }
   },
   mutateAndGetPayload: async ({ id, file }, ctx: GraphQLContext) => {
@@ -35,40 +37,46 @@ export const UserAvatarUpdateMutation = mutationWithClientMutationId({
     const user = await UserModel.findOne({ _id: userId });
     if (!user) return { error: 'This user does not exist' };
 
-    const { createReadStream, mimetype } = await file;
-    const mimetypeAllowed = ['image/jpeg', 'image/png'];
+    const { createReadStream, mimetype, filename } = await file;
 
+    const mimetypeAllowed = ['image/jpeg', 'image/png'];
     if (!mimetypeAllowed.includes(mimetype)) {
       return {
         error: 'File mimetype not allowed'
       };
     }
 
-    if (user.avatarUrl) {
-      await deleteObjectFromS3(`avatar/${user._id}`);
+    if (user.avatar?.key) {
+      await deleteObjectFromS3(user.avatar.key);
     }
 
     const fileReadStream = createReadStream();
-    const responseUpload = await uploadObjectToS3(
-      fileReadStream,
-      `avatar/${user._id}`
-    );
+    const random = crypto.randomBytes(16).toString('hex');
+    const fileKey = `avatar/${random}-${filename}`;
+    const responseUpload = await uploadObjectToS3(fileReadStream, fileKey);
 
     const userUpdated = await UserModel.findOneAndUpdate(
       { _id: userId },
-      { $set: { avatarUrl: responseUpload?.Location } },
+      {
+        $set: {
+          avatar: {
+            key: fileKey,
+            url: responseUpload?.Location
+          }
+        }
+      },
       { new: true }
     );
 
     return {
-      avatarUrl: userUpdated?.avatarUrl,
+      user: userUpdated,
       error: null
     };
   },
   outputFields: {
-    avatarUrl: {
-      type: GraphQLString,
-      resolve: ({ avatarUrl }) => avatarUrl
+    user: {
+      type: UserType,
+      resolve: ({ user }) => user
     },
     error: {
       type: GraphQLString,
