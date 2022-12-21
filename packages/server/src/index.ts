@@ -11,7 +11,7 @@ import { initDB } from './config/database';
     process.exit(1);
   }
 
-  app.listen(config.PORT, async () => {
-    console.log(`Server is running on port ${config.PORT}`);
+  app.listen(config.port, async () => {
+    console.log(`Server is running on port ${config.port}`);
   });
 })();
