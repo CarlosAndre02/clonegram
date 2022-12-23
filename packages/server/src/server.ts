@@ -9,8 +9,24 @@ import {
   shouldRenderGraphiQL
 } from 'graphql-helix';
 import { graphqlUploadKoa } from 'graphql-upload-cjs';
+import { ExecutionResult, GraphQLError } from 'graphql';
 
 import { schema } from './schema/schema';
+
+const formatResult = (result: ExecutionResult) => {
+  const formattedResult: ExecutionResult = {
+    data: result.data
+  };
+
+  if (result.errors) {
+    formattedResult.errors = result.errors.map((error) => {
+      console.log(error);
+      return new GraphQLError(error.message, { ...error });
+    });
+  }
+
+  return formattedResult;
+};
 
 const app = new Koa();
 
@@ -41,7 +57,7 @@ app.use(async (ctx) => {
     });
 
     ctx.respond = false;
-    sendResult(result, ctx.res);
+    sendResult(result, ctx.res, formatResult);
   }
 });
 
