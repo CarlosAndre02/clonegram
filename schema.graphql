@@ -121,6 +121,7 @@ type Mutation {
 
   """Delete user avatar"""
   UserAvatarDeleteMutation(input: DeleteUserAvatarInput!): DeleteUserAvatarPayload
+  AuthLoginMutation(input: LoginUserInput!): LoginUserPayload
 }
 
 type CreateUserPayload {
@@ -173,5 +174,26 @@ type DeleteUserAvatarPayload {
 
 input DeleteUserAvatarInput {
   id: ID!
+  clientMutationId: String
+}
+
+type LoginUserPayload {
+  token: Auth
+  clientMutationId: String
+}
+
+"""Auth data"""
+type Auth implements Node {
+  """The ID of an object"""
+  id: ID!
+  user: User
+  accessToken: String
+  refreshToken: String
+  expiresDate: String
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
   clientMutationId: String
 }
