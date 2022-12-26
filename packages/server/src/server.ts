@@ -12,6 +12,7 @@ import { graphqlUploadKoa } from 'graphql-upload-cjs';
 import { ExecutionResult, GraphQLError } from 'graphql';
 
 import { schema } from './schema/schema';
+import { getContext } from './utils/getContext';
 
 const formatResult = (result: ExecutionResult) => {
   const formattedResult: ExecutionResult = {
@@ -36,6 +37,8 @@ app.use(cors());
 app.use(graphqlUploadKoa({ maxFileSize: 10000000, maxFiles: 10 }));
 
 app.use(async (ctx) => {
+  const graphqlContext = await getContext(ctx);
+
   const request = {
     body: ctx.request.body,
     headers: ctx.req.headers,
@@ -53,7 +56,12 @@ app.use(async (ctx) => {
       query,
       variables,
       request,
-      schema
+      schema,
+      contextFactory: () => {
+        return {
+          ...graphqlContext
+        };
+      }
     });
 
     ctx.respond = false;

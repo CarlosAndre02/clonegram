@@ -2,7 +2,7 @@ import { DataLoaders } from './loaderRegister';
 import { UserDocument } from '../user/UserModel';
 
 type GraphQLContext = {
-  user?: UserDocument;
+  user: UserDocument | null;
   dataloaders: DataLoaders;
 };
 
