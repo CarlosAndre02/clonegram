@@ -1,17 +1,19 @@
-import { sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 import { AuthModel, IAuth, AuthDocument } from './AuthModel';
+import { UserDocument } from '@/modules/user/UserModel';
+import { getUserById } from '@/modules/user/UserService';
 import { config } from '@/config/env';
 import { addDays } from '@/shared/DateProvider';
 
 export const createAccessToken = (userId: IAuth['user']): string => {
-  return sign({ userId }, config.secretAccessToken ?? '', {
+  return jwt.sign({ userId }, config.secretAccessToken ?? '', {
     expiresIn: config.expiresInAccessToken
   });
 };
 
 export const createRefreshToken = (userId: IAuth['user']): string => {
-  return sign({ userId }, config.secretRefreshToken ?? '', {
+  return jwt.sign({ userId }, config.secretRefreshToken ?? '', {
     expiresIn: config.expiresInRefreshToken
   });
 };
@@ -40,4 +42,15 @@ export const authenticateUser = async (
 
 export const logoutUser = async (user: string): Promise<void> => {
   await AuthModel.deleteMany({ user });
+};
+
+export const getUserByAccessToken = async (
+  jwtToken: string
+): Promise<UserDocument | null> => {
+  const [, token] = jwtToken.split(' ');
+
+  const data = jwt.verify(token, config.secretAccessToken || '') as {
+    userId: string;
+  };
+  return await getUserById(data.userId);
 };
