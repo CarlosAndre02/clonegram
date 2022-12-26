@@ -37,3 +37,7 @@ export const authenticateUser = async (
     expiresDate
   });
 };
+
+export const logoutUser = async (user: string): Promise<void> => {
+  await AuthModel.deleteMany({ user });
+};

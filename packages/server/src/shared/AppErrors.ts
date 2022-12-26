@@ -22,6 +22,6 @@ export class BadRequestError extends AppError {
 
 export class AuthError extends AppError {
   constructor(message: string) {
-    super({ message, statusCode: 401, code: 'UNAUTHENTICATED' });
+    super({ message, statusCode: 401, code: 'UNAUTHORIZED' });
   }
 }
