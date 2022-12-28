@@ -2,9 +2,10 @@ import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql';
 import { fromGlobalId, mutationWithClientMutationId } from 'graphql-relay';
 
 import { UserModel } from '../UserModel';
+import { UserType } from '../UserType';
 import { GraphQLContext } from '@/modules/graphql/types';
 import { deleteObjectFromS3 } from '@/services/S3Service';
-import { UserType } from '../UserType';
+import { AuthError } from '@/shared/AppErrors';
 
 export const UserAvatarDeleteMutation = mutationWithClientMutationId({
   name: 'DeleteUserAvatar',
@@ -15,19 +16,12 @@ export const UserAvatarDeleteMutation = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ id }, ctx: GraphQLContext) => {
-    // TODO: Uncomment when login is implemented
-    // if (!ctx.user) {
-    //   return {
-    //     error: 'Sorry! You must be logged in to continue'
-    //   };
-    // }
+    if (!ctx.user)
+      throw new AuthError('Sorry! You must be logged in to continue');
 
     const { id: userId } = fromGlobalId(id);
-    // if (ctx.user._id !== userId) {
-    //   return {
-    //     error: "Sorry! You're unauthorized to continue"
-    //   };
-    // }
+    if (ctx.user.id !== userId)
+      throw new AuthError("Sorry! You're unauthorized to continue");
 
     const user = await UserModel.findOne({ _id: userId });
     if (!user) return { error: 'This user does not exist' };
