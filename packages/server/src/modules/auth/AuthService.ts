@@ -33,11 +33,16 @@ export const authenticateUser = async (
 
   const expiresDate = addDays(Number(config.expiresInRefreshTokenDays));
 
-  return await saveAuthenticatedUser({
+  const authenticated = await saveAuthenticatedUser({
     user: userId,
     refreshToken,
     expiresDate
   });
+
+  const accessToken = createAccessToken(userId);
+  authenticated['accessToken'] = accessToken;
+
+  return authenticated;
 };
 
 export const logoutUser = async (user: string): Promise<void> => {
@@ -49,8 +54,15 @@ export const getUserByAccessToken = async (
 ): Promise<UserDocument | null> => {
   const [, token] = jwtToken.split(' ');
 
-  const data = jwt.verify(token, config.secretAccessToken || '') as JwtPayload;
-  return await getUserById(data.userId);
+  try {
+    const data = jwt.verify(
+      token,
+      config.secretAccessToken || ''
+    ) as JwtPayload;
+    return await getUserById(data.userId);
+  } catch {
+    return null;
+  }
 };
 
 export const getUserIdFromRefreshToken = (token: string): string => {

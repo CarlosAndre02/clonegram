@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 
-import { createAccessToken, authenticateUser } from '../AuthService';
+import { authenticateUser } from '../AuthService';
 import { AuthType } from '../AuthType';
 import { getUserByEmail } from '@/modules/user/UserService';
 import { BadRequestError } from '@/shared/AppErrors';
@@ -23,9 +23,7 @@ export const AuthLoginMutation = mutationWithClientMutationId({
     if (!user.isPasswordValid(password))
       throw new BadRequestError('Invalid credentials');
 
-    const accessToken = createAccessToken(user.id);
     const authenticatedUser = await authenticateUser(user.id);
-    authenticatedUser['accessToken'] = accessToken;
 
     return { token: authenticatedUser };
   },

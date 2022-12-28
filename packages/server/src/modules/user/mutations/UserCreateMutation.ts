@@ -3,6 +3,8 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 
 import { UserModel } from '../UserModel';
 import { UserType } from '../UserType';
+import { authenticateUser } from '@/modules/auth/AuthService';
+import { AuthType } from '@/modules/auth/AuthType';
 
 export const CreateUserMutation = mutationWithClientMutationId({
   name: 'CreateUser',
@@ -35,12 +37,18 @@ export const CreateUserMutation = mutationWithClientMutationId({
       };
     }
 
-    const user = new UserModel({ email, fullname, username, password }).save();
+    const user = await new UserModel({
+      email,
+      fullname,
+      username,
+      password
+    }).save();
 
-    // TODO: Generate a access token
+    const authenticatedUser = await authenticateUser(user.id);
 
     return {
-      user, // this will be changed
+      user,
+      token: authenticatedUser,
       error: null
     };
   },
@@ -48,6 +56,10 @@ export const CreateUserMutation = mutationWithClientMutationId({
     user: {
       type: UserType,
       resolve: ({ user }) => user
+    },
+    token: {
+      type: AuthType,
+      resolve: ({ token }) => token
     },
     error: {
       type: GraphQLString,
