@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 import { AuthModel, IAuth, AuthDocument } from './AuthModel';
 import { UserDocument } from '@/modules/user/UserModel';
@@ -6,13 +6,13 @@ import { getUserById } from '@/modules/user/UserService';
 import { config } from '@/config/env';
 import { addDays } from '@/shared/DateProvider';
 
-export const createAccessToken = (userId: IAuth['user']): string => {
+export const createAccessToken = (userId: IAuth['user'] | string): string => {
   return jwt.sign({ userId }, config.secretAccessToken ?? '', {
     expiresIn: config.expiresInAccessToken
   });
 };
 
-export const createRefreshToken = (userId: IAuth['user']): string => {
+export const createRefreshToken = (userId: IAuth['user'] | string): string => {
   return jwt.sign({ userId }, config.secretRefreshToken ?? '', {
     expiresIn: config.expiresInRefreshToken
   });
@@ -49,8 +49,18 @@ export const getUserByAccessToken = async (
 ): Promise<UserDocument | null> => {
   const [, token] = jwtToken.split(' ');
 
-  const data = jwt.verify(token, config.secretAccessToken || '') as {
-    userId: string;
-  };
+  const data = jwt.verify(token, config.secretAccessToken || '') as JwtPayload;
   return await getUserById(data.userId);
+};
+
+export const getUserIdFromRefreshToken = (token: string): string => {
+  const data = jwt.verify(token, config.secretRefreshToken || '') as JwtPayload;
+  return data.userId;
+};
+
+export const refreshTokenExists = (
+  refreshToken: string,
+  user: string
+): boolean => {
+  return !!AuthModel.exists({ refreshToken, user });
 };

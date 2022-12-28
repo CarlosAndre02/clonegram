@@ -123,6 +123,7 @@ type Mutation {
   UserAvatarDeleteMutation(input: DeleteUserAvatarInput!): DeleteUserAvatarPayload
   AuthLoginMutation(input: LoginUserInput!): LoginUserPayload
   AuthLogoutMutation(input: LogoutUserInput!): LogoutUserPayload
+  AuthRefreshTokenMutation(input: RefreshTokenInput!): RefreshTokenPayload
 }
 
 type CreateUserPayload {
@@ -205,5 +206,15 @@ type LogoutUserPayload {
 }
 
 input LogoutUserInput {
+  clientMutationId: String
+}
+
+type RefreshTokenPayload {
+  accessToken: String
+  clientMutationId: String
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
   clientMutationId: String
 }
