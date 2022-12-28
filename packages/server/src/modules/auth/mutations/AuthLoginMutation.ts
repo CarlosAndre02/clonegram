@@ -23,8 +23,8 @@ export const AuthLoginMutation = mutationWithClientMutationId({
     if (!user.isPasswordValid(password))
       throw new BadRequestError('Invalid credentials');
 
-    const accessToken = createAccessToken(user._id);
-    const authenticatedUser = await authenticateUser(user._id);
+    const accessToken = createAccessToken(user.id);
+    const authenticatedUser = await authenticateUser(user.id);
     authenticatedUser['accessToken'] = accessToken;
 
     return { token: authenticatedUser };

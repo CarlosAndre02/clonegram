@@ -13,7 +13,7 @@ export const AuthLogoutMutation = mutationWithClientMutationId({
 
     await logoutUser(ctx.user._id);
 
-    return { deletedUserId: ctx.user._id };
+    return { deletedUserId: ctx.user.id };
   },
   outputFields: {
     deletedUserId: {

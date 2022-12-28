@@ -83,9 +83,9 @@ export const UserType = new GraphQLObjectType({
     followed_by_viewer: {
       type: new GraphQLNonNull(GraphQLBoolean),
       resolve: (user, _args, context: GraphQLContext) => {
-        if (!context?.user || user._id === context?.user._id) return false;
+        if (!context?.user || user.id === context?.user.id) return false;
 
-        return user.followers.includes(context?.user._id);
+        return user.followers.includes(context?.user.id);
       }
     }
   }),
