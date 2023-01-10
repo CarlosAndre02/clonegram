@@ -9,6 +9,12 @@ export const SignupMutation = graphql`
         fullname
         email
       }
+      token {
+        id
+        accessToken
+        refreshToken
+        expiresDate
+      }
       error
     }
   }

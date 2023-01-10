@@ -16,6 +16,7 @@ import * as Yup from 'yup';
 import { useCallback, useState } from 'react';
 import { useNavigate, Link as ReactLink } from 'react-router-dom';
 
+import { useAuth } from '../AuthContext';
 import clonegramLogo from '@/assets/clonegram-logo.png';
 import { useCustomMutation } from '@/relay/useCustomMutation';
 import { ErrorMessage } from '@/shared/ErrorMessage';
@@ -25,6 +26,7 @@ import { SignupMutation } from '../mutations/SignupMutation';
 export default function SignupPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { loginUser } = useAuth();
   const [commitSignup, isMutationLoading] =
     useCustomMutation<SignupMutationType>(SignupMutation);
 
@@ -62,9 +64,13 @@ export default function SignupPage() {
             return;
           }
 
-          // TODO: SignIn user
+          if (CreateUserMutation?.token) {
+            const { accessToken, refreshToken, expiresDate } =
+              CreateUserMutation.token;
+            loginUser({ accessToken, refreshToken, expiresDate });
 
-          navigate(`/${CreateUserMutation?.user?.username}`);
+            navigate(`/${CreateUserMutation?.user?.username}`);
+          }
         },
         onError: () => {
           setError('Um erro inesperado aconteceu. Tente novamente');
