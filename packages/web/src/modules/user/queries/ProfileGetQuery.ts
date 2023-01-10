@@ -13,5 +13,8 @@ export const ProfileGetQuery = graphql`
       posts_count
       followed_by_viewer
     }
+    me {
+      username
+    }
   }
 `;

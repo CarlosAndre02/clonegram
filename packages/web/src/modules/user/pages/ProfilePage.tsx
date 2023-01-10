@@ -9,14 +9,15 @@ import {
   Text
 } from '@chakra-ui/react';
 import { useLazyLoadQuery } from 'react-relay';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 
 import { ProfileGetQuery } from '../queries/ProfileGetQuery';
 import { ProfileGetQuery as ProfileGetQueryType } from '../queries/__generated__/ProfileGetQuery.graphql';
 
 export default function ProfilePage() {
   const { username } = useParams();
-  const { GetUserQuery } = useLazyLoadQuery<ProfileGetQueryType>(
+  const navigate = useNavigate();
+  const { GetUserQuery, me } = useLazyLoadQuery<ProfileGetQueryType>(
     ProfileGetQuery,
     {
       username: username ?? ''
@@ -46,16 +47,12 @@ export default function ProfilePage() {
               >
                 {GetUserQuery.username}
               </Heading>
-              {/* TODO */}
-              {/* eslint-disable no-constant-condition */}
-              {true ? (
-                GetUserQuery.followed_by_viewer ? (
-                  <UnfollowButton />
-                ) : (
-                  <FollowButton />
-                )
+              {GetUserQuery.username == me?.username ? (
+                <EditProfileButton navigator={navigate} />
+              ) : GetUserQuery.followed_by_viewer ? (
+                <UnfollowButton />
               ) : (
-                <EditProfileButton />
+                <FollowButton />
               )}
             </Flex>
 
@@ -151,7 +148,7 @@ const UnfollowButton = () => (
   </Button>
 );
 
-const EditProfileButton = () => (
+const EditProfileButton = ({ navigator }: { navigator: NavigateFunction }) => (
   <Button
     fontSize="14px"
     bg="#transparent"
@@ -160,6 +157,7 @@ const EditProfileButton = () => (
     size="sm"
     isLoading={false}
     _hover={{ bg: 'transparent' }}
+    onClick={() => navigator('/profile/edit')}
   >
     Editar Perfil
   </Button>
