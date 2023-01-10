@@ -1,19 +1,17 @@
-import {
-  Environment,
-  Network,
-  RecordSource,
-  Store,
-  FetchFunction
-} from 'relay-runtime';
+import { FetchFunction } from 'relay-runtime';
+
+import { getToken } from '@/modules/auth/localStorage';
 
 const HTTP_ENDPOINT = import.meta.env.VITE_API_BASE_URL;
 
-const fetchRelay: FetchFunction = async (
+export const fetchGraphQL: FetchFunction = async (
   query,
   variables,
   cacheConfig,
   uploadables
 ) => {
+  const userToken = getToken();
+
   const headers: any = {};
   let body: any = {};
 
@@ -47,9 +45,9 @@ const fetchRelay: FetchFunction = async (
     });
   }
 
-  // if (token) {
-  //   headers['Authorization'] = `Bearer <token>`;
-  // }
+  if (userToken?.accessToken) {
+    headers['authorization'] = `Bearer ${userToken.accessToken}`;
+  }
 
   const request = {
     method: 'POST',
@@ -58,15 +56,5 @@ const fetchRelay: FetchFunction = async (
   };
 
   const resp = await fetch(HTTP_ENDPOINT, request);
-
-  return resp.json();
+  return await resp.json();
 };
-
-function createRelayEnvironment() {
-  return new Environment({
-    network: Network.create(fetchRelay),
-    store: new Store(new RecordSource())
-  });
-}
-
-export const RelayEnvironment = createRelayEnvironment();
