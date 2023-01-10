@@ -15,31 +15,29 @@ import {
 } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { Field, Form, FormikProvider, useFormik } from 'formik';
-import { useLazyLoadQuery, useMutation } from 'react-relay';
+import { useLazyLoadQuery } from 'react-relay';
 
 import { ProfileEditGetQuery } from '../../queries/ProfileEditGetQuery';
 import { ProfileEditGetQuery as ProfileEditGetQueryType } from '../../queries/__generated__/ProfileEditGetQuery.graphql';
 import { UserUpdateMutation } from '../../mutations/UserUpdateMutation';
 import { UserUpdateMutation as UserUpdateMutationType } from '../../mutations/__generated__/UserUpdateMutation.graphql';
 import { AvatarUploadModal } from './AvatarUploadModal';
+import { useCustomMutation } from '@/relay/useCustomMutation';
 
 export default function ProfileEditPage() {
-  const username = 'messi123'; // TODO: This username should come from logged user
-  const { GetUserQuery } = useLazyLoadQuery<ProfileEditGetQueryType>(
+  const { me } = useLazyLoadQuery<ProfileEditGetQueryType>(
     ProfileEditGetQuery,
-    {
-      username: username ?? ''
-    }
+    {}
   );
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [commitUserUpdate, isMutationLoading] =
-    useMutation<UserUpdateMutationType>(UserUpdateMutation);
+    useCustomMutation<UserUpdateMutationType>(UserUpdateMutation);
 
   const formik = useFormik({
     initialValues: {
-      fullname: GetUserQuery?.fullname ?? '',
-      biography: GetUserQuery?.biography ?? ''
+      fullname: me?.fullname ?? '',
+      biography: me?.biography ?? ''
     },
     validationSchema: Yup.object().shape({
       fullname: Yup.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
@@ -52,15 +50,18 @@ export default function ProfileEditPage() {
       commitUserUpdate({
         variables: {
           input: {
-            id: GetUserQuery?.id ?? '',
+            id: me?.id ?? '',
             fullname: fullname || null,
             biography: biography || null
           }
         },
-        onCompleted: ({ UserUpdateMutation }) => {
-          if (UserUpdateMutation?.error) {
+        onCompleted: ({ UserUpdateMutation }, error) => {
+          if (UserUpdateMutation?.error || error) {
+            const errorMessage = error
+              ? error[0].message
+              : UserUpdateMutation?.error;
             toast({
-              title: UserUpdateMutation?.error,
+              title: errorMessage,
               status: 'error',
               duration: 2500,
               isClosable: true
@@ -119,11 +120,11 @@ export default function ProfileEditPage() {
                   w="38px"
                   h="38px"
                   bg="lightgrey"
-                  src={GetUserQuery?.avatarUrl ?? undefined}
+                  src={me?.avatarUrl ?? undefined}
                 />
               </Flex>
               <Box>
-                <Text wordBreak="break-word">{GetUserQuery?.username}</Text>
+                <Text wordBreak="break-word">{me?.username}</Text>
                 <Button
                   h="max-content"
                   m="0"
@@ -140,8 +141,8 @@ export default function ProfileEditPage() {
                 <AvatarUploadModal
                   isOpen={isOpen}
                   onClose={onClose}
-                  userId={GetUserQuery?.id ?? ''}
-                  hasAvatar={!!GetUserQuery?.avatarUrl}
+                  userId={me?.id ?? ''}
+                  hasAvatar={!!me?.avatarUrl}
                 />
               </Box>
             </HStack>
