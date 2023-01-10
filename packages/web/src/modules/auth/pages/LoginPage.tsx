@@ -14,10 +14,10 @@ import {
 import { Field, Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useCallback, useState } from 'react';
-import { useMutation } from 'react-relay';
 import { useNavigate, Link as ReactLink } from 'react-router-dom';
 
 import clonegramLogo from '@/assets/clonegram-logo.png';
+import { useCustomMutation } from '@/relay/useCustomMutation';
 import { ErrorMessage } from '@/shared/ErrorMessage';
 import { useAuth } from '../AuthContext';
 import { LoginMutation } from '../mutations/LoginMutation';
@@ -28,7 +28,7 @@ export default function LoginPage() {
   const { loginUser } = useAuth();
   const navigate = useNavigate();
   const [commitLogin, isMutationLoading] =
-    useMutation<LoginMutationType>(LoginMutation);
+    useCustomMutation<LoginMutationType>(LoginMutation);
 
   const formik = useFormik({
     initialValues: {

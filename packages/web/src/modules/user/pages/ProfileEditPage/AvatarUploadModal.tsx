@@ -9,9 +9,9 @@ import {
   Input,
   useToast
 } from '@chakra-ui/react';
-import { useMutation } from 'react-relay';
 import { useRef, ChangeEvent } from 'react';
 
+import { useCustomMutation } from '@/relay/useCustomMutation';
 import { ProfileAvatarUpdateMutation } from '../../mutations/ProfileAvatarUpdateMutation';
 import { ProfileAvatarUpdateMutation as ProfileAvatarUpdateMutationType } from '../../mutations/__generated__/ProfileAvatarUpdateMutation.graphql';
 import { ProfileAvatarDeleteMutation } from '../../mutations/ProfileAvatarDeleteMutation';
@@ -33,9 +33,13 @@ export function AvatarUploadModal({
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [commitAvatarUpdate, isAvatarUpdateLoading] =
-    useMutation<ProfileAvatarUpdateMutationType>(ProfileAvatarUpdateMutation);
+    useCustomMutation<ProfileAvatarUpdateMutationType>(
+      ProfileAvatarUpdateMutation
+    );
   const [commitAvatarDelete, isAvatarDeleteLoading] =
-    useMutation<ProfileAvatarDeleteMutationType>(ProfileAvatarDeleteMutation);
+    useCustomMutation<ProfileAvatarDeleteMutationType>(
+      ProfileAvatarDeleteMutation
+    );
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
@@ -52,10 +56,13 @@ export function AvatarUploadModal({
       uploadables: {
         file: event.target.files[0]
       },
-      onCompleted: ({ UserAvatarUpdateMutation }) => {
-        if (UserAvatarUpdateMutation?.error) {
+      onCompleted: ({ UserAvatarUpdateMutation }, error) => {
+        if (UserAvatarUpdateMutation?.error || error) {
+          const errorMessage = error
+            ? error[0].message
+            : UserAvatarUpdateMutation?.error;
           toast({
-            title: UserAvatarUpdateMutation?.error,
+            title: errorMessage,
             status: 'error',
             duration: 4000,
             isClosable: true
@@ -83,10 +90,13 @@ export function AvatarUploadModal({
           id: userId
         }
       },
-      onCompleted: ({ UserAvatarDeleteMutation }) => {
-        if (UserAvatarDeleteMutation?.error) {
+      onCompleted: ({ UserAvatarDeleteMutation }, error) => {
+        if (UserAvatarDeleteMutation?.error || error) {
+          const errorMessage = error
+            ? error[0].message
+            : UserAvatarDeleteMutation?.error;
           toast({
-            title: UserAvatarDeleteMutation?.error,
+            title: errorMessage,
             status: 'error',
             duration: 4000,
             isClosable: true

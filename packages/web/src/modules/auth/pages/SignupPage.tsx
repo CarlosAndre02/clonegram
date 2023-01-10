@@ -1,21 +1,23 @@
 import {
   Box,
   Button,
+  Center,
   FormControl,
   FormErrorMessage,
   Image,
   Input,
   InputProps,
+  Link,
   Text,
   VStack
 } from '@chakra-ui/react';
 import { Field, Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useCallback, useState } from 'react';
-import { useMutation } from 'react-relay';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as ReactLink } from 'react-router-dom';
 
 import clonegramLogo from '@/assets/clonegram-logo.png';
+import { useCustomMutation } from '@/relay/useCustomMutation';
 import { ErrorMessage } from '@/shared/ErrorMessage';
 import { SignupMutation as SignupMutationType } from '../mutations/__generated__/SignupMutation.graphql';
 import { SignupMutation } from '../mutations/SignupMutation';
@@ -24,7 +26,7 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const [commitSignup, isMutationLoading] =
-    useMutation<SignupMutationType>(SignupMutation);
+    useCustomMutation<SignupMutationType>(SignupMutation);
 
   const formik = useFormik({
     initialValues: {
@@ -76,76 +78,94 @@ export default function SignupPage() {
   }, []);
 
   return (
-    <Box
-      bg={{ base: 'transparent', md: 'white' }}
-      border={{ base: 'none', md: '2px solid rgb(219, 219, 219)' }}
-      borderRadius="1px"
-      mt="35px"
-      mx="auto"
-      p="50px 40px"
-      maxWidth="350px"
-    >
-      <VStack spacing="20px">
-        <Image src={clonegramLogo} alt="Clonegram Logo" w="175px" />
-        <Text
-          w="88%"
-          color="#8e8e8e"
-          textAlign="center"
-          fontWeight="semibold"
-          fontSize="17px"
-        >
-          Cadastre-se para ver fotos dos seus amigos.
+    <>
+      <Box
+        bg={{ base: 'transparent', md: 'white' }}
+        border={{ base: 'none', md: '2px solid rgb(219, 219, 219)' }}
+        borderRadius="1px"
+        mt="35px"
+        mx="auto"
+        p="50px 40px"
+        maxWidth="350px"
+      >
+        <VStack spacing="20px">
+          <Image src={clonegramLogo} alt="Clonegram Logo" w="175px" />
+          <Text
+            w="88%"
+            color="#8e8e8e"
+            textAlign="center"
+            fontWeight="semibold"
+            fontSize="17px"
+          >
+            Cadastre-se para ver fotos dos seus amigos.
+          </Text>
+        </VStack>
+
+        {!!error && <ErrorMessage message={error} onCloseAlert={handleClose} />}
+
+        <FormikProvider value={formik}>
+          <Form>
+            <VStack mt="20px" spacing="8px">
+              <InputField
+                type="email"
+                name="email"
+                placeholder="Email"
+                error={formik.errors.email}
+                wasTouched={formik.touched.email}
+              />
+              <InputField
+                type="text"
+                name="fullname"
+                placeholder="Nome Completo"
+                error={formik.errors.fullname}
+                wasTouched={formik.touched.fullname}
+              />
+              <InputField
+                type="text"
+                name="username"
+                placeholder="Nome de usuário"
+                error={formik.errors.username}
+                wasTouched={formik.touched.username}
+              />
+              <InputField
+                type="password"
+                name="password"
+                placeholder="Senha"
+                error={formik.errors.password}
+                wasTouched={formik.touched.password}
+              />
+              <Button
+                type="submit"
+                w="100%"
+                bg="#0095f6"
+                color="white"
+                size="sm"
+                isLoading={isMutationLoading}
+                _hover={{ bg: '#4db5f9' }}
+              >
+                Cadastre-se
+              </Button>
+            </VStack>
+          </Form>
+        </FormikProvider>
+      </Box>
+      <Center
+        bg={{ base: 'transparent', md: 'white' }}
+        border={{ base: 'none', md: '2px solid rgb(219, 219, 219)' }}
+        borderRadius="1px"
+        mt="10px"
+        mx="auto"
+        p="15px"
+        maxWidth="350px"
+      >
+        <Text fontSize="15px">
+          Tem uma conta?{' '}
+          <Link as={ReactLink} to="/" color="#0095f6">
+            Conecte-se
+          </Link>
         </Text>
-      </VStack>
-
-      {!!error && <ErrorMessage message={error} onCloseAlert={handleClose} />}
-
-      <FormikProvider value={formik}>
-        <Form>
-          <VStack mt="20px" spacing="8px">
-            <InputField
-              type="email"
-              name="email"
-              placeholder="Email"
-              error={formik.errors.email}
-              wasTouched={formik.touched.email}
-            />
-            <InputField
-              type="text"
-              name="fullname"
-              placeholder="Nome Completo"
-              error={formik.errors.fullname}
-              wasTouched={formik.touched.fullname}
-            />
-            <InputField
-              type="text"
-              name="username"
-              placeholder="Nome de usuário"
-              error={formik.errors.username}
-              wasTouched={formik.touched.username}
-            />
-            <InputField
-              type="password"
-              name="password"
-              placeholder="Senha"
-              error={formik.errors.password}
-              wasTouched={formik.touched.password}
-            />
-            <Button
-              type="submit"
-              w="100%"
-              bg="#0095f6"
-              color="white"
-              size="sm"
-              isLoading={isMutationLoading}
-              _hover={{ bg: '#4db5f9' }}
-            >
-              Cadastre-se
-            </Button>
-          </VStack>
-        </Form>
-      </FormikProvider>
-    </Box>
+      </Center>
+    </>
   );
 }
 
