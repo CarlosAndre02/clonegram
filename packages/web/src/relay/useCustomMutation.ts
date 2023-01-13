@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useMutation } from 'react-relay';
 import {
   GraphQLTaggedNode,
@@ -35,13 +35,15 @@ type PayloadErrorExtension = PayloadError & {
 export const useCustomMutation = <TMutation extends MutationParameters>(
   mutation: GraphQLTaggedNode
 ): [(config: UseMutationConfig<TMutation>) => void, boolean] => {
-  const [shouldRetry, setShouldRetry] = useState(false);
-  const [currentConfig, setCurrentConfig] =
-    useState<UseMutationConfig<TMutation> | null>(null);
   const { logoutUser } = useAuth();
-  const [refreshToken, isRefreshLoading] = useRefreshToken();
+  const { refreshToken } = useRefreshToken();
   const navigate = useNavigate();
   const [commitMutation, isInFlight] = useMutation<TMutation>(mutation);
+
+  const handleRefreshError = useCallback(() => {
+    logoutUser();
+    navigate('/');
+  }, [logoutUser, navigate]);
 
   const commit = useCallback(
     (config: UseMutationConfig<TMutation>) => {
@@ -51,12 +53,9 @@ export const useCustomMutation = <TMutation extends MutationParameters>(
           const error = errors as PayloadErrorExtension[];
           if (error && error[0].extensions.statusCode === 401) {
             try {
-              refreshToken();
-              setCurrentConfig(config);
-              setShouldRetry(true);
+              refreshToken(() => commitMutation(config), handleRefreshError);
             } catch (_) {
-              logoutUser();
-              navigate('/');
+              handleRefreshError();
             }
             return;
           }
@@ -64,15 +63,8 @@ export const useCustomMutation = <TMutation extends MutationParameters>(
         }
       });
     },
-    [commitMutation, logoutUser, navigate, refreshToken]
+    [commitMutation, handleRefreshError, refreshToken]
   );
-
-  useEffect(() => {
-    if (!isRefreshLoading && shouldRetry && currentConfig) {
-      commitMutation(currentConfig);
-      setShouldRetry(false);
-    }
-  }, [isRefreshLoading, shouldRetry, currentConfig, commitMutation]);
 
   return [commit, isInFlight];
 };
