@@ -22,7 +22,7 @@ export type UserToken = {
 type AuthContextType = {
   userToken: UserToken | null;
   loginUser: (userPayload: UserToken) => void;
-  logoutUser: () => void;
+  logoutUser: (cb?: VoidFunction, handleError?: VoidFunction) => void;
 };
 
 type AuthContextProviderProps = {
@@ -45,22 +45,30 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     []
   );
 
-  const logoutUser = useCallback<AuthContextType['logoutUser']>(() => {
-    commitLogout({
-      variables: {
-        input: {}
-      },
-      onCompleted: (_, error) => {
-        if (error) throw new Error(error[0].message);
-      },
-      onError: () => {
-        throw new Error('An unexpected error occurred');
-      }
-    });
+  const logoutUser = useCallback<AuthContextType['logoutUser']>(
+    (cb, handleError) => {
+      commitLogout({
+        variables: {
+          input: {}
+        },
+        onCompleted: (_, error) => {
+          if (error) {
+            handleError && handleError();
+            return;
+          }
 
-    deleteToken();
-    setUserToken(null);
-  }, [commitLogout]);
+          cb && cb();
+        },
+        onError: () => {
+          handleError && handleError();
+        }
+      });
+
+      deleteToken();
+      setUserToken(null);
+    },
+    [commitLogout]
+  );
 
   useEffect(() => {
     const userPayload = getToken();

@@ -16,6 +16,8 @@ import {
 import * as Yup from 'yup';
 import { Field, Form, FormikProvider, useFormik } from 'formik';
 import { useLazyLoadQuery } from 'react-relay';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import { ProfileEditGetQuery } from '../../queries/ProfileEditGetQuery';
 import { ProfileEditGetQuery as ProfileEditGetQueryType } from '../../queries/__generated__/ProfileEditGetQuery.graphql';
@@ -23,12 +25,15 @@ import { UserUpdateMutation } from '../../mutations/UserUpdateMutation';
 import { UserUpdateMutation as UserUpdateMutationType } from '../../mutations/__generated__/UserUpdateMutation.graphql';
 import { AvatarUploadModal } from './AvatarUploadModal';
 import { useCustomMutation } from '@/relay/useCustomMutation';
+import { useAuth } from '@/modules/auth/AuthContext';
 
 export default function ProfileEditPage() {
   const { me } = useLazyLoadQuery<ProfileEditGetQueryType>(
     ProfileEditGetQuery,
     {}
   );
+  const { logoutUser } = useAuth();
+  const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [commitUserUpdate, isMutationLoading] =
@@ -95,6 +100,12 @@ export default function ProfileEditPage() {
       });
     }
   });
+
+  useEffect(() => {
+    if (!me) {
+      logoutUser(() => navigate('/'));
+    }
+  }, [logoutUser, me, navigate]);
 
   return (
     <Container
