@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
 import { Providers } from '@/providers';
-import { AppRoutes } from '@/Routes';
+import { AppRoutes } from '@/routes/Routes';
 import { LoadingPage } from '@/shared/LoadingPage';
 
 export function App() {
