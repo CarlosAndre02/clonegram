@@ -22,7 +22,7 @@ import { ProfileEditGetQuery as ProfileEditGetQueryType } from '../../queries/__
 import { UserUpdateMutation } from '../../mutations/UserUpdateMutation';
 import { UserUpdateMutation as UserUpdateMutationType } from '../../mutations/__generated__/UserUpdateMutation.graphql';
 import { AvatarUploadModal } from './AvatarUploadModal';
-import { Header } from '@/shared/Header';
+import { Header } from '@/shared/Header/Header';
 
 export default function ProfileEditPage() {
   const { me } = useLazyLoadQuery<ProfileEditGetQueryType>(
@@ -98,7 +98,7 @@ export default function ProfileEditPage() {
 
   return (
     <>
-      <Header />
+      <Header me={me} />
       <Container
         maxW="900px"
         w={{ base: '95vw', lg: 'unset' }}

@@ -15,6 +15,7 @@ export const ProfileGetQuery = graphql`
     }
     me {
       username
+      ...HeaderFragment_user
     }
   }
 `;

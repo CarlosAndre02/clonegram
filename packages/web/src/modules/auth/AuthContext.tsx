@@ -38,7 +38,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [isLoggedIn, setIsLoggedIn] = useState<AuthContextType['isLoggedIn']>(
-    () => !!getToken
+    () => !!getToken()
   );
   const navigate = useNavigate();
   const [commitLogout] = useMutation<LogoutMutationType>(LogoutMutation);
@@ -117,7 +117,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       }
     }
 
-    const interval = setInterval(() => refreshToken(), 1000 * 60 * 14); // 14 minutes
+    const interval = setInterval(() => refreshToken(), 1000 * 60 * 10); // 10 minutes
     return () => clearInterval(interval);
   }, [isLoggedIn, logoutUser, navigate, refreshToken]);
 

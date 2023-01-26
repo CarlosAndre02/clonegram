@@ -8,6 +8,7 @@ export const ProfileEditGetQuery = graphql`
       fullname
       biography
       avatarUrl
+      ...HeaderFragment_user
     }
   }
 `;

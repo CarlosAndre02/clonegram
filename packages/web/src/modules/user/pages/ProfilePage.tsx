@@ -13,20 +13,36 @@ import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 
 import { ProfileGetQuery } from '../queries/ProfileGetQuery';
 import { ProfileGetQuery as ProfileGetQueryType } from '../queries/__generated__/ProfileGetQuery.graphql';
+import { useAuth } from '@/modules/auth/AuthContext';
+import { Header } from '@/shared/Header/Header';
 
 export default function ProfilePage() {
   const { username } = useParams();
-  const navigate = useNavigate();
   const { GetUserQuery, me } = useLazyLoadQuery<ProfileGetQueryType>(
     ProfileGetQuery,
     {
       username: username ?? ''
-    }
+    },
+    { fetchPolicy: 'store-and-network' }
   );
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
+  if (!GetUserQuery) {
+    return (
+      <>
+        <Header me={me} />
+        <Center height="90vh" fontSize="xl">
+          Esse usuário não existe
+        </Center>
+      </>
+    );
+  }
 
   return (
-    <Container maxW="870px" p="unset">
-      {GetUserQuery ? (
+    <>
+      <Header me={me} />
+      <Container maxW="870px" p="unset">
         <Flex p="40px 20px 110px" position="relative">
           <Center minW={{ md: '30%' }} mr="30px">
             <Avatar
@@ -111,12 +127,8 @@ export default function ProfilePage() {
           </Flex>
           {/* <Divider borderColor="lightgray" /> */}
         </Flex>
-      ) : (
-        <Center height="100vh" fontSize="xl">
-          Esse usuário não existe
-        </Center>
-      )}
-    </Container>
+      </Container>
+    </>
   );
 }
 
