@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/modules/auth/AuthContext';
 
 export function PrivateRoute() {
-  const { userToken } = useAuth();
+  const { isLoggedIn } = useAuth();
 
-  return userToken ? <Outlet /> : <Navigate to={'/'} />;
+  return isLoggedIn ? <Outlet /> : <Navigate to={'/'} />;
 }

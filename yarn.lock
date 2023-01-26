@@ -6209,6 +6209,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jwt-decode@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "jwt-decode@npm:3.1.2"
+  checksum: 20a4b072d44ce3479f42d0d2c8d3dabeb353081ba4982e40b83a779f2459a70be26441be6c160bfc8c3c6eadf9f6380a036fbb06ac5406b5674e35d8c4205eeb
+  languageName: node
+  linkType: hard
+
 "kareem@npm:2.4.1":
   version: 2.4.1
   resolution: "kareem@npm:2.4.1"
@@ -8763,6 +8770,7 @@ __metadata:
     babel-plugin-relay: ^14.1.0
     formik: ^2.2.9
     framer-motion: ^7.4.0
+    jwt-decode: ^3.1.2
     react: ^18.2.0
     react-dom: ^18.2.0
     react-relay: ^14.1.0
