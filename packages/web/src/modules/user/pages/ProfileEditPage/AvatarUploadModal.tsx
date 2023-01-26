@@ -10,8 +10,8 @@ import {
   useToast
 } from '@chakra-ui/react';
 import { useRef, ChangeEvent } from 'react';
+import { useMutation } from 'react-relay';
 
-import { useCustomMutation } from '@/relay/useCustomMutation';
 import { ProfileAvatarUpdateMutation } from '../../mutations/ProfileAvatarUpdateMutation';
 import { ProfileAvatarUpdateMutation as ProfileAvatarUpdateMutationType } from '../../mutations/__generated__/ProfileAvatarUpdateMutation.graphql';
 import { ProfileAvatarDeleteMutation } from '../../mutations/ProfileAvatarDeleteMutation';
@@ -33,13 +33,9 @@ export function AvatarUploadModal({
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [commitAvatarUpdate, isAvatarUpdateLoading] =
-    useCustomMutation<ProfileAvatarUpdateMutationType>(
-      ProfileAvatarUpdateMutation
-    );
+    useMutation<ProfileAvatarUpdateMutationType>(ProfileAvatarUpdateMutation);
   const [commitAvatarDelete, isAvatarDeleteLoading] =
-    useCustomMutation<ProfileAvatarDeleteMutationType>(
-      ProfileAvatarDeleteMutation
-    );
+    useMutation<ProfileAvatarDeleteMutationType>(ProfileAvatarDeleteMutation);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {

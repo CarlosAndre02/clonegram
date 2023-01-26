@@ -15,20 +15,20 @@ import { Field, Form, FormikProvider, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useCallback, useState } from 'react';
 import { useNavigate, Link as ReactLink } from 'react-router-dom';
+import { useMutation } from 'react-relay';
 
-import { useAuth } from '../AuthContext';
-import clonegramLogo from '@/assets/clonegram-logo.png';
-import { useCustomMutation } from '@/relay/useCustomMutation';
-import { ErrorMessage } from '@/shared/ErrorMessage';
 import { SignupMutation as SignupMutationType } from '../mutations/__generated__/SignupMutation.graphql';
 import { SignupMutation } from '../mutations/SignupMutation';
+import { useAuth } from '../AuthContext';
+import clonegramLogo from '@/assets/clonegram-logo.png';
+import { ErrorMessage } from '@/shared/ErrorMessage';
 
 export default function SignupPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { loginUser } = useAuth();
   const [commitSignup, isMutationLoading] =
-    useCustomMutation<SignupMutationType>(SignupMutation);
+    useMutation<SignupMutationType>(SignupMutation);
 
   const formik = useFormik({
     initialValues: {

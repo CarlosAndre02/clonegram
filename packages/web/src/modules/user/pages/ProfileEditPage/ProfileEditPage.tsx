@@ -15,29 +15,24 @@ import {
 } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { Field, Form, FormikProvider, useFormik } from 'formik';
-import { useLazyLoadQuery } from 'react-relay';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useLazyLoadQuery, useMutation } from 'react-relay';
 
 import { ProfileEditGetQuery } from '../../queries/ProfileEditGetQuery';
 import { ProfileEditGetQuery as ProfileEditGetQueryType } from '../../queries/__generated__/ProfileEditGetQuery.graphql';
 import { UserUpdateMutation } from '../../mutations/UserUpdateMutation';
 import { UserUpdateMutation as UserUpdateMutationType } from '../../mutations/__generated__/UserUpdateMutation.graphql';
 import { AvatarUploadModal } from './AvatarUploadModal';
-import { useCustomMutation } from '@/relay/useCustomMutation';
-import { useAuth } from '@/modules/auth/AuthContext';
+import { Header } from '@/shared/Header';
 
 export default function ProfileEditPage() {
   const { me } = useLazyLoadQuery<ProfileEditGetQueryType>(
     ProfileEditGetQuery,
     {}
   );
-  const { logoutUser } = useAuth();
-  const navigate = useNavigate();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [commitUserUpdate, isMutationLoading] =
-    useCustomMutation<UserUpdateMutationType>(UserUpdateMutation);
+    useMutation<UserUpdateMutationType>(UserUpdateMutation);
 
   const formik = useFormik({
     initialValues: {
@@ -101,144 +96,143 @@ export default function ProfileEditPage() {
     }
   });
 
-  useEffect(() => {
-    if (!me) {
-      logoutUser(() => navigate('/'));
-    }
-  }, [logoutUser, me, navigate]);
-
   return (
-    <Container
-      maxW="900px"
-      w={{ base: '95vw', lg: 'unset' }}
-      mt="25px"
-      py="35px"
-      px={{ base: '25px', md: '60px' }}
-      border="1px solid lightgray"
-      bg="white"
-    >
-      <FormikProvider value={formik}>
-        <Form>
-          <Flex direction="column">
-            <HStack mb="25px" spacing="0">
-              <Flex
-                w={{ base: 'max-content', md: '84px' }}
-                mr="37px"
-                justify="flex-end"
-                align="flex-start"
-              >
-                <Avatar
-                  w="38px"
-                  h="38px"
-                  bg="lightgrey"
-                  src={me?.avatarUrl ?? undefined}
-                />
-              </Flex>
-              <Box>
-                <Text wordBreak="break-word">{me?.username}</Text>
-                <Button
-                  h="max-content"
-                  m="0"
-                  p="0"
-                  fontSize="13px"
-                  bg="transparent"
-                  color="#0095f6"
-                  _hover={{ bg: 'initial', color: '#1c1e21' }}
-                  _active={{ color: 'grey' }}
-                  onClick={onOpen}
+    <>
+      <Header />
+      <Container
+        maxW="900px"
+        w={{ base: '95vw', lg: 'unset' }}
+        mt="25px"
+        py="35px"
+        px={{ base: '25px', md: '60px' }}
+        border="1px solid lightgray"
+        bg="white"
+      >
+        <FormikProvider value={formik}>
+          <Form>
+            <Flex direction="column">
+              <HStack mb="25px" spacing="0">
+                <Flex
+                  w={{ base: 'max-content', md: '84px' }}
+                  mr="37px"
+                  justify="flex-end"
+                  align="flex-start"
                 >
-                  Alterar foto do perfil
-                </Button>
-                <AvatarUploadModal
-                  isOpen={isOpen}
-                  onClose={onClose}
-                  userId={me?.id ?? ''}
-                  hasAvatar={!!me?.avatarUrl}
-                />
-              </Box>
-            </HStack>
-            <Flex direction={{ base: 'column', md: 'row' }} mb="25px">
-              <Flex
-                w={{ base: 'max-content', md: '100px' }}
-                mr="35px"
-                mb="10px"
-                justify="flex-end"
-                align="flex-start"
-              >
-                <Text fontSize="14px" fontWeight="bold">
-                  Nome
-                </Text>
+                  <Avatar
+                    w="38px"
+                    h="38px"
+                    bg="lightgrey"
+                    src={me?.avatarUrl ?? undefined}
+                  />
+                </Flex>
+                <Box>
+                  <Text wordBreak="break-word">{me?.username}</Text>
+                  <Button
+                    h="max-content"
+                    m="0"
+                    p="0"
+                    fontSize="13px"
+                    bg="transparent"
+                    color="#0095f6"
+                    _hover={{ bg: 'initial', color: '#1c1e21' }}
+                    _active={{ color: 'grey' }}
+                    onClick={onOpen}
+                  >
+                    Alterar foto do perfil
+                  </Button>
+                  <AvatarUploadModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    userId={me?.id ?? ''}
+                    hasAvatar={!!me?.avatarUrl}
+                  />
+                </Box>
+              </HStack>
+              <Flex direction={{ base: 'column', md: 'row' }} mb="25px">
+                <Flex
+                  w={{ base: 'max-content', md: '100px' }}
+                  mr="35px"
+                  mb="10px"
+                  justify="flex-end"
+                  align="flex-start"
+                >
+                  <Text fontSize="14px" fontWeight="bold">
+                    Nome
+                  </Text>
+                </Flex>
+                <FormControl
+                  isInvalid={
+                    formik.touched.fullname && !!formik.errors.fullname
+                  }
+                >
+                  <Field
+                    as={Input}
+                    type="text"
+                    name="fullname"
+                    maxW="350px"
+                    h="30px"
+                    bg="transparent"
+                    fontSize="14px"
+                    border="1px solid"
+                    borderColor="lightgray"
+                    _focus={{ borderColor: 'gray' }}
+                    _placeholder={{ color: 'gray' }}
+                  />
+                  <FormErrorMessage>{formik.errors.fullname}</FormErrorMessage>
+                </FormControl>
               </Flex>
-              <FormControl
-                isInvalid={formik.touched.fullname && !!formik.errors.fullname}
-              >
-                <Field
-                  as={Input}
-                  type="text"
-                  name="fullname"
-                  maxW="350px"
-                  h="30px"
-                  bg="transparent"
-                  fontSize="14px"
-                  border="1px solid"
-                  borderColor="lightgray"
-                  _focus={{ borderColor: 'gray' }}
-                  _placeholder={{ color: 'gray' }}
-                />
-                <FormErrorMessage>{formik.errors.fullname}</FormErrorMessage>
-              </FormControl>
-            </Flex>
-            <Flex direction={{ base: 'column', md: 'row' }}>
-              <Flex
-                w={{ base: 'max-content', md: '100px' }}
-                mr="35px"
-                mb="10px"
-                justify="flex-end"
-                align="flex-start"
-              >
-                <Text fontSize="14px" fontWeight="bold">
-                  Biografia
-                </Text>
+              <Flex direction={{ base: 'column', md: 'row' }}>
+                <Flex
+                  w={{ base: 'max-content', md: '100px' }}
+                  mr="35px"
+                  mb="10px"
+                  justify="flex-end"
+                  align="flex-start"
+                >
+                  <Text fontSize="14px" fontWeight="bold">
+                    Biografia
+                  </Text>
+                </Flex>
+                <FormControl
+                  isInvalid={
+                    formik.touched.biography && !!formik.errors.biography
+                  }
+                >
+                  <Field
+                    as={Textarea}
+                    type="text"
+                    name="biography"
+                    resize="none"
+                    maxW="350px"
+                    h="60px"
+                    fontSize="14px"
+                    border="1px solid"
+                    borderColor="lightgray"
+                    _focus={{ borderColor: 'gray' }}
+                    _placeholder={{ color: 'gray' }}
+                  />
+                  <FormErrorMessage>{formik.errors.biography}</FormErrorMessage>
+                </FormControl>
               </Flex>
-              <FormControl
-                isInvalid={
-                  formik.touched.biography && !!formik.errors.biography
-                }
+              <Button
+                type="submit"
+                w={{ md: '60px' }}
+                maxW="350px"
+                ml={{ md: '120px' }}
+                mt="15px"
+                p="15px"
+                bg="#0095f6"
+                color="white"
+                size="xs"
+                isLoading={isMutationLoading}
+                _hover={{ bg: '#4db5f9' }}
               >
-                <Field
-                  as={Textarea}
-                  type="text"
-                  name="biography"
-                  resize="none"
-                  maxW="350px"
-                  h="60px"
-                  fontSize="14px"
-                  border="1px solid"
-                  borderColor="lightgray"
-                  _focus={{ borderColor: 'gray' }}
-                  _placeholder={{ color: 'gray' }}
-                />
-                <FormErrorMessage>{formik.errors.biography}</FormErrorMessage>
-              </FormControl>
+                Enviar
+              </Button>
             </Flex>
-            <Button
-              type="submit"
-              w={{ md: '60px' }}
-              maxW="350px"
-              ml={{ md: '120px' }}
-              mt="15px"
-              p="15px"
-              bg="#0095f6"
-              color="white"
-              size="xs"
-              isLoading={isMutationLoading}
-              _hover={{ bg: '#4db5f9' }}
-            >
-              Enviar
-            </Button>
-          </Flex>
-        </Form>
-      </FormikProvider>
-    </Container>
+          </Form>
+        </FormikProvider>
+      </Container>
+    </>
   );
 }
