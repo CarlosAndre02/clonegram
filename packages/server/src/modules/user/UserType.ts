@@ -47,24 +47,23 @@ export const UserType = new GraphQLObjectType({
     // posts: {
 
     // }
-    // TODO: Test it later. Im not sure if this works
     followers: {
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
       resolve: (user, args, context: GraphQLContext) => {
         return UserLoader.loadAll(
           context,
-          withFilter(args, { _id: { $in: user.followers } })
+          withFilter(args, { following: user.id })
         );
       }
     },
     following: {
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
-      resolve: (user, args, context: GraphQLContext) => {
+      resolve: async (user, args, context: GraphQLContext) => {
         return UserLoader.loadAll(
           context,
-          withFilter(args, { _id: { $in: user.following } })
+          withFilter(args, { followers: user.id })
         );
       }
     },
