@@ -8,11 +8,15 @@ import {
   HStack,
   Text
 } from '@chakra-ui/react';
-import { useLazyLoadQuery } from 'react-relay';
+import { useLazyLoadQuery, useMutation } from 'react-relay';
 import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 
 import { ProfileGetQuery } from '../queries/ProfileGetQuery';
 import { ProfileGetQuery as ProfileGetQueryType } from '../queries/__generated__/ProfileGetQuery.graphql';
+import { ProfileFollowMutation } from '../mutations/ProfileFollowMutation';
+import { ProfileFollowMutation as ProfileFollowMutationType } from '../mutations/__generated__/ProfileFollowMutation.graphql';
+import { ProfileUnfollowMutation } from '../mutations/ProfileUnfollowMutation';
+import { ProfileUnfollowMutation as ProfileUnfollowMutationType } from '../mutations/__generated__/ProfileUnfollowMutation.graphql';
 import { useAuth } from '@/modules/auth/AuthContext';
 import { Header } from '@/shared/Header/Header';
 
@@ -25,8 +29,12 @@ export default function ProfilePage() {
     },
     { fetchPolicy: 'store-and-network' }
   );
-  const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const [commitFollow, isFollowLoading] =
+    useMutation<ProfileFollowMutationType>(ProfileFollowMutation);
+  const [commitUnfollow, isUnfollowLoading] =
+    useMutation<ProfileUnfollowMutationType>(ProfileUnfollowMutation);
 
   if (!GetUserQuery) {
     return (
@@ -38,6 +46,35 @@ export default function ProfilePage() {
       </>
     );
   }
+
+  const handleFollowButton = () => {
+    if (!isLoggedIn) {
+      navigate('/');
+      return;
+    }
+
+    const isFollowing = GetUserQuery.followed_by_viewer;
+    const config = {
+      variables: {
+        input: {
+          followeeId: GetUserQuery.id
+        }
+      },
+      optimisticResponse: {
+        UserFollowMutation: {
+          followee: {
+            id: GetUserQuery.id,
+            followers_count:
+              GetUserQuery.followers_count + (isFollowing ? -1 : 1),
+            followed_by_viewer: !isFollowing
+          }
+        }
+      }
+    };
+
+    const mutation = isFollowing ? commitUnfollow : commitFollow;
+    mutation(config);
+  };
 
   return (
     <>
@@ -66,9 +103,15 @@ export default function ProfilePage() {
               {GetUserQuery.username == me?.username ? (
                 <EditProfileButton navigator={navigate} />
               ) : GetUserQuery.followed_by_viewer ? (
-                <UnfollowButton />
+                <UnfollowButton
+                  handleUnfollow={handleFollowButton}
+                  isLoading={isUnfollowLoading}
+                />
               ) : (
-                <FollowButton />
+                <FollowButton
+                  handleFollow={handleFollowButton}
+                  isLoading={isFollowLoading}
+                />
               )}
             </Flex>
 
@@ -132,29 +175,43 @@ export default function ProfilePage() {
   );
 }
 
-const FollowButton = () => (
+const FollowButton = ({
+  handleFollow,
+  isLoading
+}: {
+  handleFollow: VoidFunction;
+  isLoading: boolean;
+}) => (
   <Button
     fontSize="14px"
     bg="#0095f6"
     color="white"
     px="6"
     size="sm"
-    isLoading={false}
     _hover={{ bg: '#1aa0f7' }}
+    isLoading={isLoading}
+    onClick={handleFollow}
   >
     Seguir
   </Button>
 );
 
-const UnfollowButton = () => (
+const UnfollowButton = ({
+  handleUnfollow,
+  isLoading
+}: {
+  handleUnfollow: VoidFunction;
+  isLoading: boolean;
+}) => (
   <Button
     fontSize="14px"
     bg="#transparent"
     px="6"
     border="1px solid lightgray"
     size="sm"
-    isLoading={false}
     _hover={{ bg: 'transparent' }}
+    isLoading={isLoading}
+    onClick={handleUnfollow}
   >
     Seguindo
   </Button>

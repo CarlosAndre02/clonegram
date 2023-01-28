@@ -14,6 +14,7 @@ export const ProfileGetQuery = graphql`
       followed_by_viewer
     }
     me {
+      id
       username
       ...HeaderFragment_user
     }

@@ -121,6 +121,8 @@ type Mutation {
 
   """Delete user avatar"""
   UserAvatarDeleteMutation(input: DeleteUserAvatarInput!): DeleteUserAvatarPayload
+  UserFollowMutation(input: FollowUserInput!): FollowUserPayload
+  UserUnfollowMutation(input: UnfollowUserInput!): UnfollowUserPayload
   AuthLoginMutation(input: LoginUserInput!): LoginUserPayload
   AuthLogoutMutation(input: LogoutUserInput!): LogoutUserPayload
   AuthRefreshTokenMutation(input: RefreshTokenInput!): RefreshTokenPayload
@@ -187,6 +189,28 @@ type DeleteUserAvatarPayload {
 
 input DeleteUserAvatarInput {
   id: ID!
+  clientMutationId: String
+}
+
+type FollowUserPayload {
+  follower: User
+  followee: User
+  clientMutationId: String
+}
+
+input FollowUserInput {
+  followeeId: ID!
+  clientMutationId: String
+}
+
+type UnfollowUserPayload {
+  follower: User
+  followee: User
+  clientMutationId: String
+}
+
+input UnfollowUserInput {
+  followeeId: ID!
   clientMutationId: String
 }
 
