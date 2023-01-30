@@ -5,18 +5,18 @@ import {
   GraphQLInt,
   GraphQLBoolean
 } from 'graphql';
-import { globalIdField } from 'graphql-relay';
+import { globalIdField, connectionFromArray } from 'graphql-relay';
 import {
   connectionDefinitions,
-  connectionArgs,
-  withFilter
+  connectionArgs
 } from '@entria/graphql-mongo-helpers';
 
+import { UserModel } from './UserModel';
+import { load } from './UserLoader';
 import {
   registerTypeLoader,
   nodeInterface
 } from '@/modules/graphql/typeRegister';
-import UserLoader, { load } from './UserLoader';
 import { GraphQLContext } from '@/modules/graphql/types';
 
 export const UserType = new GraphQLObjectType({
@@ -50,21 +50,21 @@ export const UserType = new GraphQLObjectType({
     followers: {
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
-      resolve: (user, args, context: GraphQLContext) => {
-        return UserLoader.loadAll(
-          context,
-          withFilter(args, { following: user.id })
-        );
+      resolve: async (user, args) => {
+        const followers = await UserModel.find({
+          _id: { $in: user.followers }
+        });
+        return connectionFromArray(followers, args);
       }
     },
     following: {
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
-      resolve: async (user, args, context: GraphQLContext) => {
-        return UserLoader.loadAll(
-          context,
-          withFilter(args, { followers: user.id })
-        );
+      resolve: async (user, args) => {
+        const usersFollowing = await UserModel.find({
+          _id: { $in: user.following }
+        });
+        return connectionFromArray(usersFollowing, args);
       }
     },
     followers_count: {
