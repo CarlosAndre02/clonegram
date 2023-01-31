@@ -36,3 +36,18 @@ export const updatePost = async ({
 
   return post;
 };
+
+export const deletePost = async (
+  id: string,
+  user: string
+): Promise<PostDocument> => {
+  const post = await PostModel.findById(id);
+  if (!post) throw new BadRequestError('Post does not exist');
+
+  if (post?.user.toString() !== user)
+    throw new BadRequestError('You are unauthorized to delete this post');
+
+  await post.delete();
+
+  return post;
+};
