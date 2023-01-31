@@ -2,6 +2,7 @@ import { GraphQLObjectType } from 'graphql';
 
 import { nodeField, nodesField } from '../modules/graphql/typeRegister';
 import * as userQueries from '@/modules/user/queries';
+import * as postQueries from '@/modules/post/queries';
 
 export const QueryType = new GraphQLObjectType({
   name: 'Query',
@@ -9,6 +10,7 @@ export const QueryType = new GraphQLObjectType({
   fields: () => ({
     node: nodeField,
     nodes: nodesField,
-    ...userQueries
+    ...userQueries,
+    ...postQueries
   })
 });

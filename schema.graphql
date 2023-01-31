@@ -13,6 +13,7 @@ type Query {
   ): [Node]!
   me: User
   GetUserQuery(username: String!): User
+  PostGetQuery(id: ID!): Post
 }
 
 """An object with an ID"""
@@ -30,6 +31,7 @@ type User implements Node {
   email: String!
   biography: String
   avatarUrl: String
+  posts(after: String, first: Int, before: String, last: Int): PostConnection!
   followers(after: String, first: Int, before: String, last: Int): UserConnection!
   following(after: String, first: Int, before: String, last: Int): UserConnection!
   followers_count: Int!
@@ -39,7 +41,7 @@ type User implements Node {
 }
 
 """A connection to a list of items."""
-type UserConnection implements Connection {
+type PostConnection implements Connection {
   """Number of items in this connection."""
   count: Int
 
@@ -61,7 +63,7 @@ type UserConnection implements Connection {
   pageInfo: PageInfo!
 
   """A list of edges."""
-  edges: [UserEdge]!
+  edges: [PostEdge]!
 }
 
 """A connection to a list of items."""
@@ -103,6 +105,54 @@ type PageInfo {
 }
 
 """An edge in a connection."""
+type PostEdge {
+  """The item at the end of the edge."""
+  node: Post
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Post data"""
+type Post implements Node {
+  """The ID of an object"""
+  id: ID!
+  user: User!
+  description: String!
+  imageUrl: String!
+  comments_count: Int!
+  likes_count: Int!
+  createdAt: String
+  updatedAt: String
+}
+
+"""A connection to a list of items."""
+type UserConnection implements Connection {
+  """Number of items in this connection."""
+  count: Int
+
+  """
+  A count of the total number of objects in this connection, ignoring pagination.
+  This allows a client to fetch the first five objects by passing "5" as the
+  argument to "first", then fetch the total count so it could display "5 of 83",
+  for example.
+  """
+  totalCount: Int
+
+  """Offset from start."""
+  startCursorOffset: Int!
+
+  """Offset till end."""
+  endCursorOffset: Int!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]!
+}
+
+"""An edge in a connection."""
 type UserEdge {
   """The item at the end of the edge."""
   node: User
@@ -126,6 +176,9 @@ type Mutation {
   AuthLoginMutation(input: LoginUserInput!): LoginUserPayload
   AuthLogoutMutation(input: LogoutUserInput!): LogoutUserPayload
   AuthRefreshTokenMutation(input: RefreshTokenInput!): RefreshTokenPayload
+  PostCreateMutation(input: CreatePostInput!): CreatePostPayload
+  PostUpdateMutation(input: UpdatePostInput!): UpdatePostPayload
+  PostDeleteMutation(input: DeletePostInput!): DeletePostPayload
 }
 
 type CreateUserPayload {
@@ -241,5 +294,37 @@ type RefreshTokenPayload {
 
 input RefreshTokenInput {
   refreshToken: String!
+  clientMutationId: String
+}
+
+type CreatePostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input CreatePostInput {
+  description: String!
+  photo: Upload!
+  clientMutationId: String
+}
+
+type UpdatePostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input UpdatePostInput {
+  id: ID!
+  description: String!
+  clientMutationId: String
+}
+
+type DeletePostPayload {
+  post: Post
+  clientMutationId: String
+}
+
+input DeletePostInput {
+  id: ID!
   clientMutationId: String
 }
