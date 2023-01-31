@@ -24,7 +24,8 @@ const PostSchema = new Schema(
     },
     description: {
       type: String,
-      required: true
+      required: true,
+      minLength: 3
     },
     image: {
       key: {

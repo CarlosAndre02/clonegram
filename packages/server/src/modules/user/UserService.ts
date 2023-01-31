@@ -58,3 +58,19 @@ export const unfollowUser = async (
 
   return { follower, followee };
 };
+
+export const addPostToUser = async (userId: string, postId: string) => {
+  const user = await UserModel.findOneAndUpdate(
+    { _id: userId },
+    { $addToSet: { posts: postId } }
+  );
+  if (!user) throw new BadRequestError('User does not exist');
+};
+
+export const removePostFromUser = async (userId: string, postId: string) => {
+  const user = await UserModel.findOneAndUpdate(
+    { _id: userId },
+    { $pull: { posts: postId } }
+  );
+  if (!user) throw new BadRequestError('User does not exist');
+};

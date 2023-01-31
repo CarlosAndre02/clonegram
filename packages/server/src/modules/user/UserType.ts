@@ -13,6 +13,8 @@ import {
 
 import { UserModel } from './UserModel';
 import { load } from './UserLoader';
+import { PostConnection } from '@/modules/post/PostType';
+import { PostModel } from '@/modules/post/PostModel';
 import {
   registerTypeLoader,
   nodeInterface
@@ -44,9 +46,16 @@ export const UserType = new GraphQLObjectType({
       type: GraphQLString,
       resolve: (user) => user.avatar?.url
     },
-    // posts: {
-
-    // }
+    posts: {
+      type: new GraphQLNonNull(PostConnection.connectionType),
+      args: { ...connectionArgs },
+      resolve: async (user, args) => {
+        const posts = await PostModel.find({
+          _id: { $in: user.posts }
+        });
+        return connectionFromArray(posts, args);
+      }
+    },
     followers: {
       type: new GraphQLNonNull(UserConnection.connectionType),
       args: { ...connectionArgs },
