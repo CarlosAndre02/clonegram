@@ -16,15 +16,15 @@ export const PostCreateMutation = mutationWithClientMutationId({
     description: {
       type: new GraphQLNonNull(GraphQLString)
     },
-    photo: {
+    file: {
       type: new GraphQLNonNull(GraphQLUpload)
     }
   },
-  mutateAndGetPayload: async ({ description, photo }, ctx: GraphQLContext) => {
+  mutateAndGetPayload: async ({ description, file }, ctx: GraphQLContext) => {
     if (!ctx.user)
       throw new AuthError('Sorry! You must be logged in to continue');
 
-    const { createReadStream, mimetype, filename } = await photo;
+    const { createReadStream, mimetype, filename } = await file;
     const mimetypeAllowed = ['image/jpeg', 'image/png'];
 
     if (!mimetypeAllowed.includes(mimetype))
