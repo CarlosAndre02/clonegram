@@ -9,7 +9,8 @@ import {
   PopoverContent,
   PopoverBody,
   VStack,
-  Icon
+  Icon,
+  useDisclosure
 } from '@chakra-ui/react';
 import { PlusSquareIcon } from '@chakra-ui/icons';
 import { House } from 'phosphor-react';
@@ -21,6 +22,7 @@ import type {
   HeaderFragment_user$key,
   HeaderFragment_user$data
 } from './__generated__/HeaderFragment_user.graphql';
+import { CreatePostModal } from './CreatePostModal';
 import { useAuth } from '@/modules/auth/AuthContext';
 import clonegramLogo from '@/assets/clonegram-logo.png';
 
@@ -30,27 +32,53 @@ type HeaderProps = {
 
 export function Header({ me }: HeaderProps) {
   const data = useFragment(HeaderFragment, me);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
-    <Box borderBottom="1px solid lightgray" bg="white">
-      <Flex
-        maxW="870px"
-        m="0 auto"
-        h="50px"
-        px="15px"
-        align="center"
-        justify="space-between"
-      >
-        <ReactLink to="/">
-          <Image src={clonegramLogo} alt="Clonegram Logo" w="120px" h="27px" />
-        </ReactLink>
-        {data ? <ButtonsLoggedIn data={data} /> : <ButtonsNotLoggedIn />}
-      </Flex>
-    </Box>
+    <>
+      <Box borderBottom="1px solid lightgray" bg="white">
+        <Flex
+          maxW="870px"
+          m="0 auto"
+          h="50px"
+          px="15px"
+          align="center"
+          justify="space-between"
+        >
+          <ReactLink to="/">
+            <Image
+              src={clonegramLogo}
+              alt="Clonegram Logo"
+              w="120px"
+              h="27px"
+            />
+          </ReactLink>
+          {data ? (
+            <ButtonsLoggedIn data={data} onOpenPostModal={onOpen} />
+          ) : (
+            <ButtonsNotLoggedIn />
+          )}
+        </Flex>
+      </Box>
+      <CreatePostModal
+        isOpen={isOpen}
+        onClose={onClose}
+        user={{
+          avatar: data?.avatarUrl,
+          username: data?.username ?? ''
+        }}
+      />
+    </>
   );
 }
 
-const ButtonsLoggedIn = ({ data }: { data: HeaderFragment_user$data }) => {
+const ButtonsLoggedIn = ({
+  data,
+  onOpenPostModal
+}: {
+  data: HeaderFragment_user$data;
+  onOpenPostModal: VoidFunction;
+}) => {
   const navigate = useNavigate();
   const { logoutUser } = useAuth();
 
@@ -72,7 +100,7 @@ const ButtonsLoggedIn = ({ data }: { data: HeaderFragment_user$data }) => {
         cursor="pointer"
         transition="0.2s ease-in"
         _hover={{ bg: '#f2f2f2' }}
-        onClick={() => window.location.reload()}
+        onClick={onOpenPostModal}
       />
       <Popover>
         <PopoverTrigger>
