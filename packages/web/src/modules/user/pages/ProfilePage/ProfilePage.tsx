@@ -11,12 +11,13 @@ import {
 import { useLazyLoadQuery, useMutation } from 'react-relay';
 import { useParams, useNavigate, NavigateFunction } from 'react-router-dom';
 
-import { ProfileGetQuery } from '../queries/ProfileGetQuery';
-import { ProfileGetQuery as ProfileGetQueryType } from '../queries/__generated__/ProfileGetQuery.graphql';
-import { ProfileFollowMutation } from '../mutations/ProfileFollowMutation';
-import { ProfileFollowMutation as ProfileFollowMutationType } from '../mutations/__generated__/ProfileFollowMutation.graphql';
-import { ProfileUnfollowMutation } from '../mutations/ProfileUnfollowMutation';
-import { ProfileUnfollowMutation as ProfileUnfollowMutationType } from '../mutations/__generated__/ProfileUnfollowMutation.graphql';
+import { PostGrid } from './PostGrid';
+import { ProfileGetQuery } from '../../queries/ProfileGetQuery';
+import { ProfileGetQuery as ProfileGetQueryType } from '../../queries/__generated__/ProfileGetQuery.graphql';
+import { ProfileFollowMutation } from '../../mutations/ProfileFollowMutation';
+import { ProfileFollowMutation as ProfileFollowMutationType } from '../../mutations/__generated__/ProfileFollowMutation.graphql';
+import { ProfileUnfollowMutation } from '../../mutations/ProfileUnfollowMutation';
+import { ProfileUnfollowMutation as ProfileUnfollowMutationType } from '../../mutations/__generated__/ProfileUnfollowMutation.graphql';
 import { useAuth } from '@/modules/auth/AuthContext';
 import { Header } from '@/shared/Header/Header';
 
@@ -79,8 +80,8 @@ export default function ProfilePage() {
   return (
     <>
       <Header me={me} />
-      <Container maxW="870px" p="unset">
-        <Flex p="40px 20px 110px" position="relative">
+      <Container maxW="870px" p="unset" mb="50px">
+        <Flex p="40px 20px 90px" position="relative">
           <Center minW={{ md: '30%' }} mr="30px">
             <Avatar
               w={{ base: '100px', md: '160px' }}
@@ -168,8 +169,9 @@ export default function ProfilePage() {
               <Text wordBreak="break-word">{GetUserQuery.biography}</Text>
             )}
           </Flex>
-          {/* <Divider borderColor="lightgray" /> */}
         </Flex>
+
+        <PostGrid GetUserQuery={GetUserQuery} />
       </Container>
     </>
   );

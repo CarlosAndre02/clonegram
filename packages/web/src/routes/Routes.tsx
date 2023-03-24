@@ -6,7 +6,9 @@ import { PublicOnlyRoute } from './PublicRoute';
 
 const SignupPage = lazy(() => import('@/modules/auth/pages/SignupPage'));
 const LoginPage = lazy(() => import('@/modules/auth/pages/LoginPage'));
-const ProfilePage = lazy(() => import('@/modules/user/pages/ProfilePage'));
+const ProfilePage = lazy(
+  () => import('@/modules/user/pages/ProfilePage/ProfilePage')
+);
 const ProfileEditPage = lazy(
   () => import('@/modules/user/pages/ProfileEditPage/ProfileEditPage')
 );

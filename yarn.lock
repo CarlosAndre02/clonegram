@@ -6709,6 +6709,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"moment@npm:^2.29.4":
+  version: 2.29.4
+  resolution: "moment@npm:2.29.4"
+  checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e
+  languageName: node
+  linkType: hard
+
 "mongodb-connection-string-url@npm:^2.5.4":
   version: 2.6.0
   resolution: "mongodb-connection-string-url@npm:2.6.0"
@@ -8848,6 +8855,7 @@ __metadata:
     formik: ^2.2.9
     framer-motion: ^7.4.0
     jwt-decode: ^3.1.2
+    moment: ^2.29.4
     phosphor-react: ^1.4.1
     react: ^18.2.0
     react-dom: ^18.2.0

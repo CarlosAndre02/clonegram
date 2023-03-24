@@ -12,6 +12,7 @@ export const ProfileGetQuery = graphql`
       following_count
       posts_count
       followed_by_viewer
+      ...PostGridFragment_user
     }
     me {
       id
