@@ -171,7 +171,7 @@ export default function ProfilePage() {
           </Flex>
         </Flex>
 
-        <PostGrid GetUserQuery={GetUserQuery} />
+        <PostGrid GetUserQuery={GetUserQuery} me={me} />
       </Container>
     </>
   );

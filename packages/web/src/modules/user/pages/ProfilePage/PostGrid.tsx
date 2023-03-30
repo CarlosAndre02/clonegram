@@ -29,17 +29,27 @@ import type {
   PostGridFragment_user$key,
   PostGridFragment_user$data
 } from './__generated__/PostGridFragment_user.graphql';
+import { PostGridMeFragment } from './PostGridMeFragment';
+import type { PostGridMeFragment_user$key } from './__generated__/PostGridMeFragment_user.graphql';
+import { PostModalOptions } from './PostModalOptions';
 
 type PostGridProps = {
   GetUserQuery: PostGridFragment_user$key | null;
+  me: PostGridMeFragment_user$key | null;
 };
 
 type Post = PostGridFragment_user$data['posts']['edges'][0];
 
-export const PostGrid = ({ GetUserQuery }: PostGridProps) => {
+export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
   const [post, setPost] = useState<Post | null>(null);
   const data = useFragment(PostGridFragment, GetUserQuery);
+  const meData = useFragment(PostGridMeFragment, me);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isModalOptionsOpen,
+    onOpen: onOpenModalOptions,
+    onClose: onCloseModalOptions
+  } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onOpenPostModal = (postModal: Post) => {
@@ -53,7 +63,7 @@ export const PostGrid = ({ GetUserQuery }: PostGridProps) => {
         {data?.posts?.edges?.map((edge) => {
           return (
             <GridItem
-              key={edge?.node?.id}
+              key={edge?.node?.id ?? ''}
               className="grid-item"
               h={{ base: '140px', sm: '200px', md: '270px' }}
               cursor="pointer"
@@ -168,7 +178,21 @@ export const PostGrid = ({ GetUserQuery }: PostGridProps) => {
                       {data?.username}
                     </Text>
                   </Flex>
-                  <DotsThreeOutline size={15} weight="fill" cursor="pointer" />
+                  {data?.username == meData?.username && (
+                    <>
+                      <DotsThreeOutline
+                        size={15}
+                        weight="fill"
+                        cursor="pointer"
+                        onClick={onOpenModalOptions}
+                      />
+                      <PostModalOptions
+                        isOpen={isModalOptionsOpen}
+                        onClose={onCloseModalOptions}
+                        postId={post?.node?.id ?? ''}
+                      />
+                    </>
+                  )}
                 </Flex>
               </GridItem>
               <GridItem

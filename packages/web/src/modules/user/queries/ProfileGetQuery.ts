@@ -18,6 +18,7 @@ export const ProfileGetQuery = graphql`
       id
       username
       ...HeaderFragment_user
+      ...PostGridMeFragment_user
     }
   }
 `;
