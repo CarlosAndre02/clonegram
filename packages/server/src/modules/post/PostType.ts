@@ -2,7 +2,8 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLBoolean
 } from 'graphql';
 import { connectionFromArray, globalIdField } from 'graphql-relay';
 import {
@@ -17,6 +18,7 @@ import {
   registerTypeLoader,
   nodeInterface
 } from '@/modules/graphql/typeRegister';
+import { GraphQLContext } from '@/modules/graphql/types';
 import { UserType } from '@/modules/user/UserType';
 import { getUserById } from '@/modules/user/UserService';
 
@@ -56,6 +58,14 @@ export const PostType = new GraphQLObjectType<PostDocument>({
     likes_count: {
       type: new GraphQLNonNull(GraphQLInt),
       resolve: (post) => post.likes.length
+    },
+    liked_by_viewer: {
+      type: new GraphQLNonNull(GraphQLBoolean),
+      resolve: (post, _args, context: GraphQLContext) => {
+        if (!context.user) return false;
+
+        return post.likes.includes(context.user.id);
+      }
     },
     ...timestampResolver
   }),
