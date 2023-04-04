@@ -51,3 +51,31 @@ export const deletePost = async (
 
   return post;
 };
+
+export const likePost = async (
+  id: string,
+  user: string
+): Promise<PostDocument> => {
+  const post = await PostModel.findOneAndUpdate(
+    { _id: id },
+    { $addToSet: { likes: user } },
+    { new: true }
+  );
+  if (!post) throw new BadRequestError('Post does not exist');
+
+  return post;
+};
+
+export const unlikePost = async (
+  id: string,
+  user: string
+): Promise<PostDocument> => {
+  const post = await PostModel.findOneAndUpdate(
+    { _id: id },
+    { $pull: { likes: user } },
+    { new: true }
+  );
+  if (!post) throw new BadRequestError('Post does not exist');
+
+  return post;
+};
