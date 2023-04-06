@@ -52,7 +52,7 @@ export const UserType = new GraphQLObjectType({
       resolve: async (user, args) => {
         const posts = await PostModel.find({
           _id: { $in: user.posts }
-        });
+        }).sort({ createdAt: -1 });
         return connectionFromArray(posts, args);
       }
     },

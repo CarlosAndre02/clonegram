@@ -49,7 +49,7 @@ export const PostType = new GraphQLObjectType<PostDocument>({
       resolve: async (post, args) => {
         const comments = await CommentModel.find({
           _id: { $in: post.comments }
-        });
+        }).sort({ createdAt: -1 });
         return connectionFromArray(comments, args);
       }
     },
