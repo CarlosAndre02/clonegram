@@ -21,6 +21,8 @@ import {
 import { GraphQLContext } from '@/modules/graphql/types';
 import { UserType } from '@/modules/user/UserType';
 import { getUserById } from '@/modules/user/UserService';
+import { CommentConnection } from '@/modules/comment/CommentType';
+import { CommentModel } from '@/modules/comment/CommentModel';
 
 export const PostType = new GraphQLObjectType<PostDocument>({
   name: 'Post',
@@ -41,16 +43,16 @@ export const PostType = new GraphQLObjectType<PostDocument>({
       type: new GraphQLNonNull(GraphQLString),
       resolve: (post) => post.image.url
     },
-    // comments: {
-    //   type: new GraphQLNonNull(CommentConnection.connectionType),
-    //   args: { ...connectionArgs },
-    //   resolve: async (post, args) => {
-    //     const comments = await CommentModel.find({
-    //       _id: { $in: post.comments }
-    //     });
-    //     return connectionFromArray(comments, args);
-    //   }
-    // },
+    comments: {
+      type: new GraphQLNonNull(CommentConnection.connectionType),
+      args: { ...connectionArgs },
+      resolve: async (post, args) => {
+        const comments = await CommentModel.find({
+          _id: { $in: post.comments }
+        });
+        return connectionFromArray(comments, args);
+      }
+    },
     comments_count: {
       type: new GraphQLNonNull(GraphQLInt),
       resolve: (post) => post.comments.length
