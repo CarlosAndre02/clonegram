@@ -79,3 +79,15 @@ export const unlikePost = async (
 
   return post;
 };
+
+export const postAlreadyExists = (id: string): boolean => {
+  return !!PostModel.exists({ id });
+};
+
+export const addCommentToPost = async (postId: string, commentId: string) => {
+  const post = await PostModel.findOneAndUpdate(
+    { _id: postId },
+    { $addToSet: { comments: commentId } }
+  );
+  if (!post) throw new BadRequestError('Post does not exist');
+};
