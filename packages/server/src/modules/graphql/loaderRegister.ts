@@ -2,6 +2,9 @@ export interface DataLoaders {
   UserLoader: ReturnType<typeof import('@/modules/user/UserLoader').getLoader>;
   AuthLoader: ReturnType<typeof import('@/modules/auth/AuthLoader').getLoader>;
   PostLoader: ReturnType<typeof import('@/modules/post/PostLoader').getLoader>;
+  CommentLoader: ReturnType<
+    typeof import('@/modules/comment/CommentLoader').getLoader
+  >;
 }
 
 const loaders: {
