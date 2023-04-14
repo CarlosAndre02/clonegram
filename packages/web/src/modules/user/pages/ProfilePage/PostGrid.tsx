@@ -20,8 +20,8 @@ import {
 } from '@chakra-ui/react';
 import { ChatCircle, DotsThreeOutline, Heart } from 'phosphor-react';
 import { useRef, useState } from 'react';
-import { useFragment } from 'react-relay';
-import { Link as ReactLink } from 'react-router-dom';
+import { useFragment, useMutation } from 'react-relay';
+import { Link as ReactLink, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import { PostGridFragment } from './PostGridFragment';
@@ -31,7 +31,12 @@ import type {
 } from './__generated__/PostGridFragment_user.graphql';
 import { PostGridMeFragment } from './PostGridMeFragment';
 import type { PostGridMeFragment_user$key } from './__generated__/PostGridMeFragment_user.graphql';
+import { ProfileLikePostMutation } from '../../mutations/ProfileLikePostMutation';
+import { ProfileLikePostMutation as ProfileLikePostMutationType } from '../../mutations/__generated__/ProfileLikePostMutation.graphql';
+import { ProfileUnlikePostMutation } from '../../mutations/ProfileUnlikePostMutation';
+import { ProfileUnlikePostMutation as ProfileUnlikePostMutationType } from '../../mutations/__generated__/ProfileUnlikePostMutation.graphql';
 import { PostModalOptions } from './PostModalOptions';
+import { useAuth } from '@/modules/auth/AuthContext';
 
 type PostGridProps = {
   GetUserQuery: PostGridFragment_user$key | null;
@@ -44,6 +49,8 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
   const [post, setPost] = useState<Post | null>(null);
   const data = useFragment(PostGridFragment, GetUserQuery);
   const meData = useFragment(PostGridMeFragment, me);
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isModalOptionsOpen,
@@ -51,10 +58,57 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
     onClose: onCloseModalOptions
   } = useDisclosure();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [commitLikePost] = useMutation<ProfileLikePostMutationType>(
+    ProfileLikePostMutation
+  );
+  const [commitUnlikePost] = useMutation<ProfileUnlikePostMutationType>(
+    ProfileUnlikePostMutation
+  );
 
   const onOpenPostModal = (postModal: Post) => {
     setPost(postModal);
     onOpen();
+  };
+
+  const handleLikeButton = () => {
+    if (!isLoggedIn) {
+      navigate('/');
+      return;
+    }
+    if (!post?.node) return;
+
+    const likesCount = post.node.likes_count;
+    const hasLiked = post.node.liked_by_viewer;
+
+    const config = {
+      variables: {
+        input: {
+          postId: post.node.id
+        }
+      },
+      onCompleted: (_, error: any) => {
+        if (error) {
+          setPost({
+            node: {
+              ...post.node,
+              likes_count: likesCount,
+              liked_by_viewer: hasLiked
+            }
+          });
+        }
+      }
+    };
+
+    setPost({
+      node: {
+        ...post.node,
+        likes_count: likesCount + (hasLiked ? -1 : 1),
+        liked_by_viewer: !hasLiked
+      }
+    });
+
+    const mutation = hasLiked ? commitUnlikePost : commitLikePost;
+    mutation(config);
   };
 
   return (
@@ -248,7 +302,19 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
                   </Box>
                   <Box p="10px 15px" borderTop="1px solid lightgray">
                     <HStack mb="10px" spacing="3">
-                      <Heart size="25" color="black" cursor="pointer" />
+                      <Box>
+                        <Heart
+                          size="25"
+                          cursor="pointer"
+                          weight={
+                            post?.node?.liked_by_viewer ? 'fill' : undefined
+                          }
+                          color={
+                            post?.node?.liked_by_viewer ? 'red' : undefined
+                          }
+                          onClick={handleLikeButton}
+                        />
+                      </Box>
                       <ChatCircle
                         size="25"
                         color="black"

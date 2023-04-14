@@ -12,6 +12,7 @@ export const PostGridFragment = graphql`
           imageUrl
           comments_count
           likes_count
+          liked_by_viewer
           createdAt
           updatedAt
         }
