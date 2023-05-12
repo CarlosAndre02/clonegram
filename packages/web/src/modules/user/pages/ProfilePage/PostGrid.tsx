@@ -9,7 +9,6 @@ import {
   HStack,
   Image,
   Input,
-  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -20,8 +19,8 @@ import {
 } from '@chakra-ui/react';
 import { ChatCircle, DotsThreeOutline, Heart } from 'phosphor-react';
 import { useRef, useState } from 'react';
-import { useFragment, useMutation } from 'react-relay';
-import { Link as ReactLink, useNavigate } from 'react-router-dom';
+import { UseMutationConfig, useFragment, useMutation } from 'react-relay';
+import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import { PostGridFragment } from './PostGridFragment';
@@ -35,7 +34,10 @@ import { ProfileLikePostMutation } from '../../mutations/ProfileLikePostMutation
 import { ProfileLikePostMutation as ProfileLikePostMutationType } from '../../mutations/__generated__/ProfileLikePostMutation.graphql';
 import { ProfileUnlikePostMutation } from '../../mutations/ProfileUnlikePostMutation';
 import { ProfileUnlikePostMutation as ProfileUnlikePostMutationType } from '../../mutations/__generated__/ProfileUnlikePostMutation.graphql';
+import { ProfileCommentPostMutation } from '../../mutations/ProfileCommentPostMutation';
+import { ProfileCommentPostMutation as ProfileCommentPostMutationType } from '../../mutations/__generated__/ProfileCommentPostMutation.graphql';
 import { PostModalOptions } from './PostModalOptions';
+import { Comment } from './Comment';
 import { useAuth } from '@/modules/auth/AuthContext';
 
 type PostGridProps = {
@@ -46,9 +48,10 @@ type PostGridProps = {
 type Post = PostGridFragment_user$data['posts']['edges'][0];
 
 export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
-  const [post, setPost] = useState<Post | null>(null);
   const data = useFragment(PostGridFragment, GetUserQuery);
   const meData = useFragment(PostGridMeFragment, me);
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<any>([]); // change it later
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -64,9 +67,12 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
   const [commitUnlikePost] = useMutation<ProfileUnlikePostMutationType>(
     ProfileUnlikePostMutation
   );
+  const [commitCommentPost, isCommentLoading] =
+    useMutation<ProfileCommentPostMutationType>(ProfileCommentPostMutation);
 
   const onOpenPostModal = (postModal: Post) => {
     setPost(postModal);
+    setComments(postModal?.node?.comments.edges);
     onOpen();
   };
 
@@ -80,14 +86,16 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
     const likesCount = post.node.likes_count;
     const hasLiked = post.node.liked_by_viewer;
 
-    const config = {
+    const config: UseMutationConfig<ProfileLikePostMutationType> &
+      UseMutationConfig<ProfileUnlikePostMutationType> = {
       variables: {
         input: {
           postId: post.node.id
         }
       },
-      onCompleted: (_, error: any) => {
+      onCompleted: (_, error) => {
         if (error) {
+          if (!post?.node) return;
           setPost({
             node: {
               ...post.node,
@@ -109,6 +117,34 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
 
     const mutation = hasLiked ? commitUnlikePost : commitLikePost;
     mutation(config);
+  };
+
+  const handleComment = () => {
+    if (!post?.node || !inputRef?.current?.value) return;
+
+    if (inputRef.current.value.length < 3) return;
+
+    commitCommentPost({
+      variables: {
+        input: {
+          postId: post.node.id,
+          content: inputRef.current.value
+        }
+      },
+      onCompleted: ({ CommentCreateMutation }, error) => {
+        if (error) {
+          return;
+        }
+
+        if (inputRef.current) inputRef.current.value = '';
+        setComments([
+          {
+            node: CommentCreateMutation?.comment
+          },
+          ...comments
+        ]);
+      }
+    });
   };
 
   return (
@@ -268,37 +304,24 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
                       }
                     }}
                   >
-                    <Flex align="center">
-                      <Avatar
-                        src={data?.avatarUrl ?? undefined}
-                        size="xs"
-                        mr="15px"
-                        mt="5px"
-                        alignSelf="flex-start"
-                      />
-                      <Box>
-                        <Text fontSize="13px" wordBreak="break-word">
-                          <Link
-                            as={ReactLink}
-                            mr="6px"
-                            color="blackAlpha.800"
-                            fontWeight="black"
-                            transition="ease-in 0.1s"
-                            _hover={{ color: 'blackAlpha.500' }}
-                            to={`/${data?.username}`}
-                          >
-                            {data?.username}
-                          </Link>
-                          {post?.node?.description}
-                        </Text>
-                        <Text fontSize="10px" color="gray">
-                          {`${moment(
-                            new Date(post?.node?.createdAt ?? ''),
-                            'MMDD'
-                          ).fromNow()}`}
-                        </Text>
-                      </Box>
-                    </Flex>
+                    <Comment
+                      avatar={data?.avatarUrl}
+                      username={data?.username}
+                      content={post?.node?.description}
+                      createdAt={post?.node?.createdAt}
+                      onCloseModal={onClose}
+                    />
+                    {comments.map((edge: any) => {
+                      return (
+                        <Comment
+                          avatar={edge?.node?.user.avatarUrl}
+                          username={edge?.node?.user.username}
+                          content={edge?.node?.content}
+                          createdAt={edge?.node?.createdAt}
+                          onCloseModal={onClose}
+                        />
+                      );
+                    })}
                   </Box>
                   <Box p="10px 15px" borderTop="1px solid lightgray">
                     <HStack mb="10px" spacing="3">
@@ -356,6 +379,8 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
                         variant="ghost"
                         color="#66bffa"
                         _hover={{ bg: 'none', color: '#002d4a' }}
+                        onClick={handleComment}
+                        isLoading={isCommentLoading}
                       >
                         Publicar
                       </Button>

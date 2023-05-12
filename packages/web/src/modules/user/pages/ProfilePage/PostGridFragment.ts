@@ -15,6 +15,20 @@ export const PostGridFragment = graphql`
           liked_by_viewer
           createdAt
           updatedAt
+          comments {
+            edges {
+              node {
+                id
+                user {
+                  id
+                  username
+                  avatarUrl
+                }
+                content
+                createdAt
+              }
+            }
+          }
         }
       }
     }
