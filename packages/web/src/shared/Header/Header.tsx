@@ -45,7 +45,7 @@ export function Header({ me }: HeaderProps) {
           align="center"
           justify="space-between"
         >
-          <ReactLink to="/">
+          <ReactLink to="/home">
             <Image
               src={clonegramLogo}
               alt="Clonegram Logo"
@@ -92,7 +92,7 @@ const ButtonsLoggedIn = ({
         borderRadius="100%"
         transition="0.2s ease-in"
         _hover={{ bg: '#f2f2f2' }}
-        onClick={() => window.location.reload()}
+        onClick={() => navigate('/home')}
       />
       <PlusSquareIcon
         boxSize="7"
