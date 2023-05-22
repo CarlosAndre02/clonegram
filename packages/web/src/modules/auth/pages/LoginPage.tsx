@@ -60,7 +60,7 @@ export default function LoginPage() {
             const { accessToken, refreshToken, expiresDate } =
               AuthLoginMutation.token;
             loginUser({ accessToken, refreshToken, expiresDate });
-            navigate(`/${AuthLoginMutation?.token.user?.username}`);
+            navigate('/home');
           }
         },
         onError: () => {

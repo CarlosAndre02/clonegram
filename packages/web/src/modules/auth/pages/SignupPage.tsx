@@ -69,7 +69,7 @@ export default function SignupPage() {
               CreateUserMutation.token;
             loginUser({ accessToken, refreshToken, expiresDate });
 
-            navigate(`/${CreateUserMutation?.user?.username}`);
+            navigate('/home');
           }
         },
         onError: () => {
