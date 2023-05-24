@@ -8,8 +8,8 @@ import {
 } from '@chakra-ui/react';
 import { useMutation } from 'react-relay';
 
-import { ProfilePostDeleteMutation } from '../../mutations/ProfilePostDeleteMutation';
-import { ProfilePostDeleteMutation as ProfilePostDeleteMutationType } from '../../mutations/__generated__/ProfilePostDeleteMutation.graphql';
+import { ModalPostDeleteMutation } from './mutations/ModalPostDeleteMutation';
+import { ModalPostDeleteMutation as ModalPostDeleteMutationType } from './mutations/__generated__/ModalPostDeleteMutation.graphql';
 
 type PostModalOptionsProps = {
   isOpen: boolean;
@@ -24,7 +24,7 @@ export const PostModalOptions = ({
 }: PostModalOptionsProps) => {
   const toast = useToast();
   const [commitPostDelete, isPostDeleteLoading] =
-    useMutation<ProfilePostDeleteMutationType>(ProfilePostDeleteMutation);
+    useMutation<ModalPostDeleteMutationType>(ModalPostDeleteMutation);
 
   const handleDeletePost = () => {
     commitPostDelete({
