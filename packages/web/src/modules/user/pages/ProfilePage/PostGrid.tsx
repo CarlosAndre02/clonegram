@@ -1,27 +1,16 @@
 import {
-  Avatar,
   Box,
-  Button,
   Center,
   Flex,
   Grid,
   GridItem,
-  HStack,
   Image,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalOverlay,
   Text,
   useDisclosure
 } from '@chakra-ui/react';
-import { ChatCircle, DotsThreeOutline, Heart } from 'phosphor-react';
-import { useRef, useState } from 'react';
-import { UseMutationConfig, useFragment, useMutation } from 'react-relay';
-import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
+import { ChatCircle, Heart } from 'phosphor-react';
+import { useFragment } from 'react-relay';
+import { useState } from 'react';
 
 import { PostGridFragment } from './PostGridFragment';
 import type {
@@ -30,15 +19,7 @@ import type {
 } from './__generated__/PostGridFragment_user.graphql';
 import { PostGridMeFragment } from './PostGridMeFragment';
 import type { PostGridMeFragment_user$key } from './__generated__/PostGridMeFragment_user.graphql';
-import { ProfileLikePostMutation } from '../../mutations/ProfileLikePostMutation';
-import { ProfileLikePostMutation as ProfileLikePostMutationType } from '../../mutations/__generated__/ProfileLikePostMutation.graphql';
-import { ProfileUnlikePostMutation } from '../../mutations/ProfileUnlikePostMutation';
-import { ProfileUnlikePostMutation as ProfileUnlikePostMutationType } from '../../mutations/__generated__/ProfileUnlikePostMutation.graphql';
-import { ProfileCommentPostMutation } from '../../mutations/ProfileCommentPostMutation';
-import { ProfileCommentPostMutation as ProfileCommentPostMutationType } from '../../mutations/__generated__/ProfileCommentPostMutation.graphql';
-import { PostModalOptions } from './PostModalOptions';
-import { Comment } from './Comment';
-import { useAuth } from '@/modules/auth/AuthContext';
+import { PostModal } from '@/shared/PostModal/PostModal';
 
 type PostGridProps = {
   GetUserQuery: PostGridFragment_user$key | null;
@@ -51,100 +32,11 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
   const data = useFragment(PostGridFragment, GetUserQuery);
   const meData = useFragment(PostGridMeFragment, me);
   const [post, setPost] = useState<Post | null>(null);
-  const [comments, setComments] = useState<any>([]); // change it later
-  const { isLoggedIn } = useAuth();
-  const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const {
-    isOpen: isModalOptionsOpen,
-    onOpen: onOpenModalOptions,
-    onClose: onCloseModalOptions
-  } = useDisclosure();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [commitLikePost] = useMutation<ProfileLikePostMutationType>(
-    ProfileLikePostMutation
-  );
-  const [commitUnlikePost] = useMutation<ProfileUnlikePostMutationType>(
-    ProfileUnlikePostMutation
-  );
-  const [commitCommentPost, isCommentLoading] =
-    useMutation<ProfileCommentPostMutationType>(ProfileCommentPostMutation);
 
   const onOpenPostModal = (postModal: Post) => {
     setPost(postModal);
-    setComments(postModal?.node?.comments.edges);
     onOpen();
-  };
-
-  const handleLikeButton = () => {
-    if (!isLoggedIn) {
-      navigate('/');
-      return;
-    }
-    if (!post?.node) return;
-
-    const likesCount = post.node.likes_count;
-    const hasLiked = post.node.liked_by_viewer;
-
-    const config: UseMutationConfig<ProfileLikePostMutationType> &
-      UseMutationConfig<ProfileUnlikePostMutationType> = {
-      variables: {
-        input: {
-          postId: post.node.id
-        }
-      },
-      onCompleted: (_, error) => {
-        if (error) {
-          if (!post?.node) return;
-          setPost({
-            node: {
-              ...post.node,
-              likes_count: likesCount,
-              liked_by_viewer: hasLiked
-            }
-          });
-        }
-      }
-    };
-
-    setPost({
-      node: {
-        ...post.node,
-        likes_count: likesCount + (hasLiked ? -1 : 1),
-        liked_by_viewer: !hasLiked
-      }
-    });
-
-    const mutation = hasLiked ? commitUnlikePost : commitLikePost;
-    mutation(config);
-  };
-
-  const handleComment = () => {
-    if (!post?.node || !inputRef?.current?.value) return;
-
-    if (inputRef.current.value.length < 3) return;
-
-    commitCommentPost({
-      variables: {
-        input: {
-          postId: post.node.id,
-          content: inputRef.current.value
-        }
-      },
-      onCompleted: ({ CommentCreateMutation }, error) => {
-        if (error) {
-          return;
-        }
-
-        if (inputRef.current) inputRef.current.value = '';
-        setComments([
-          {
-            node: CommentCreateMutation?.comment
-          },
-          ...comments
-        ]);
-      }
-    });
   };
 
   return (
@@ -217,181 +109,14 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
           );
         })}
       </Grid>
-      <Modal size="5xl" isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay>
-          <ModalCloseButton size="lg" color="white" />
-        </ModalOverlay>
-        <ModalContent m="30px 50px 20px" h={{ base: '720px', md: '650px' }}>
-          <ModalBody p="0" h="100%">
-            <Grid
-              templateAreas={{
-                base: '"header" "photo" "comments"',
-                md: `"photo header"
-                  "photo comments"`
-              }}
-              gridTemplateColumns={{ md: '60% 1fr' }}
-              gridTemplateRows={{
-                base: '50px 40% 1fr',
-                md: '50px 1fr'
-              }}
-              w="100%"
-              h="100%"
-            >
-              <GridItem area="photo">
-                <Image
-                  src={post?.node?.imageUrl}
-                  alt="Post photo"
-                  minWidth="100%"
-                  h="100%"
-                  objectFit="cover"
-                />
-              </GridItem>
-              <GridItem
-                area="header"
-                borderBottom="1px solid lightgray"
-                borderLeft={{ md: '1px solid lightgray' }}
-              >
-                <Flex h="100%" px="15px" align="center" justify="space-between">
-                  <Flex align="center">
-                    <Avatar
-                      src={data?.avatarUrl ?? undefined}
-                      size="xs"
-                      mr="15px"
-                    />
-                    <Text
-                      fontSize="13px"
-                      color="blackAlpha.800"
-                      fontWeight="black"
-                      transition="ease-in 0.1s"
-                      _hover={{ color: 'blackAlpha.500' }}
-                    >
-                      {data?.username}
-                    </Text>
-                  </Flex>
-                  {data?.username == meData?.username && (
-                    <>
-                      <DotsThreeOutline
-                        size={15}
-                        weight="fill"
-                        cursor="pointer"
-                        onClick={onOpenModalOptions}
-                      />
-                      <PostModalOptions
-                        isOpen={isModalOptionsOpen}
-                        onClose={onCloseModalOptions}
-                        postId={post?.node?.id ?? ''}
-                      />
-                    </>
-                  )}
-                </Flex>
-              </GridItem>
-              <GridItem
-                area="comments"
-                borderLeft={{ md: '1px solid lightgray' }}
-              >
-                <Flex direction="column" h="100%">
-                  <Box
-                    p="15px"
-                    h={{ base: '230px', md: '450px' }}
-                    overflowY="auto"
-                    sx={{
-                      '&::-webkit-scrollbar': {
-                        display: 'none'
-                      },
-                      '&': {
-                        '-ms-overflow-style': 'none',
-                        'scrollbar-width': 'none'
-                      }
-                    }}
-                  >
-                    <Comment
-                      avatar={data?.avatarUrl}
-                      username={data?.username}
-                      content={post?.node?.description}
-                      createdAt={post?.node?.createdAt}
-                      onCloseModal={onClose}
-                    />
-                    {comments.map((edge: any) => {
-                      return (
-                        <Comment
-                          avatar={edge?.node?.user.avatarUrl}
-                          username={edge?.node?.user.username}
-                          content={edge?.node?.content}
-                          createdAt={edge?.node?.createdAt}
-                          onCloseModal={onClose}
-                        />
-                      );
-                    })}
-                  </Box>
-                  <Box p="10px 15px" borderTop="1px solid lightgray">
-                    <HStack mb="10px" spacing="3">
-                      <Box>
-                        <Heart
-                          size="25"
-                          cursor="pointer"
-                          weight={
-                            post?.node?.liked_by_viewer ? 'fill' : undefined
-                          }
-                          color={
-                            post?.node?.liked_by_viewer ? 'red' : undefined
-                          }
-                          onClick={handleLikeButton}
-                        />
-                      </Box>
-                      <ChatCircle
-                        size="25"
-                        color="black"
-                        cursor="pointer"
-                        onClick={() => inputRef.current?.focus()}
-                      />
-                    </HStack>
-                    <Box
-                      mb="5px"
-                      fontSize="13px"
-                      color="blackAlpha.800"
-                      fontWeight="black"
-                    >
-                      {post?.node?.likes_count} curtida
-                      {post?.node?.likes_count != 1 && 's'}
-                    </Box>
-                    <Box
-                      mb="15px"
-                      fontSize="9px"
-                      color="gray"
-                      textTransform="uppercase"
-                    >
-                      {`${moment(new Date(post?.node?.createdAt ?? '')).format(
-                        'MMMM DD'
-                      )}`}
-                    </Box>
-                    <Flex align="center">
-                      <Input
-                        ref={inputRef}
-                        p="0"
-                        fontSize="12px"
-                        border="none"
-                        placeholder="Adicione um comentário..."
-                        _placeholder={{ color: 'gray', fontSize: '12px' }}
-                        _focus={{ boxShadow: 'none' }}
-                      />
-                      <Button
-                        size="xs"
-                        variant="ghost"
-                        color="#66bffa"
-                        _hover={{ bg: 'none', color: '#002d4a' }}
-                        onClick={handleComment}
-                        isLoading={isCommentLoading}
-                      >
-                        Publicar
-                      </Button>
-                    </Flex>
-                  </Box>
-                </Flex>
-              </GridItem>
-            </Grid>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <PostModal
+        isOpenModal={isOpen}
+        onCloseModal={onClose}
+        selectedPost={post}
+        authorUsername={data?.username}
+        authorAvatarUrl={data?.avatarUrl}
+        meUsername={meData?.username}
+      />
     </>
   );
 };
