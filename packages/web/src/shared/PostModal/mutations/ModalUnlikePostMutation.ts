@@ -1,7 +1,7 @@
 import { graphql } from 'react-relay';
 
-export const ProfileUnlikePostMutation = graphql`
-  mutation ProfileUnlikePostMutation($input: UnlikePostInput!) {
+export const ModalUnlikePostMutation = graphql`
+  mutation ModalUnlikePostMutation($input: UnlikePostInput!) {
     PostUnlikeMutation(input: $input) {
       post {
         id

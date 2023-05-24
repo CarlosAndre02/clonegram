@@ -1,7 +1,7 @@
 import { graphql } from 'react-relay';
 
-export const ProfilePostDeleteMutation = graphql`
-  mutation ProfilePostDeleteMutation($input: DeletePostInput!) {
+export const ModalPostDeleteMutation = graphql`
+  mutation ModalPostDeleteMutation($input: DeletePostInput!) {
     PostDeleteMutation(input: $input) {
       post {
         id @deleteRecord

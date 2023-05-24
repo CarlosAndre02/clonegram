@@ -1,7 +1,7 @@
 import { graphql } from 'react-relay';
 
-export const ProfileCommentPostMutation = graphql`
-  mutation ProfileCommentPostMutation($input: CreateCommentInput!) {
+export const ModalCommentPostMutation = graphql`
+  mutation ModalCommentPostMutation($input: CreateCommentInput!) {
     CommentCreateMutation(input: $input) {
       comment {
         id
