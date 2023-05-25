@@ -12,6 +12,9 @@ const ProfilePage = lazy(
 const ProfileEditPage = lazy(
   () => import('@/modules/user/pages/ProfileEditPage/ProfileEditPage')
 );
+const TimelinePage = lazy(
+  () => import('@/modules/timeline/pages/TimelinePage')
+);
 
 export const AppRoutes = () => (
   <Routes>
@@ -21,6 +24,7 @@ export const AppRoutes = () => (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/profile/edit" element={<ProfileEditPage />} />
+      <Route path="/home" element={<TimelinePage />} />
     </Route>
     <Route path="/:username" element={<ProfilePage />} />
   </Routes>
