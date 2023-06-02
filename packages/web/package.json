@@ -22,6 +22,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
+    "react-infinite-scroller": "^1.2.6",
     "react-relay": "^14.1.0",
     "react-router-dom": "^6.4.2",
     "vite-tsconfig-paths": "^3.5.2",
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
+    "@types/react-infinite-scroller": "^1.2.3",
     "@types/react-relay": "^14.1.2",
     "@types/relay-runtime": "^14.1.3",
     "@vitejs/plugin-react": "^2.1.0",
