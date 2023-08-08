@@ -13,7 +13,7 @@ const ProfileEditPage = lazy(
   () => import('@/modules/user/pages/ProfileEditPage/ProfileEditPage')
 );
 const TimelinePage = lazy(
-  () => import('@/modules/timeline/pages/TimelinePage')
+  () => import('@/modules/timeline/pages/TimelinePage/TimelinePage')
 );
 
 export const AppRoutes = () => (
