@@ -66,7 +66,7 @@ export const PostType = new GraphQLObjectType<PostDocument>({
       resolve: (post, _args, context: GraphQLContext) => {
         if (!context.user) return false;
 
-        return post.likes.includes(context.user.id);
+        return post.likes.some((like) => like.toString() === context?.user?.id);
       }
     },
     ...timestampResolver
