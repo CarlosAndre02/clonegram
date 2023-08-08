@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { ChatCircle, DotsThreeOutline, Heart } from 'phosphor-react';
 import { UseMutationConfig, useMutation } from 'react-relay';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
@@ -35,22 +35,24 @@ import { useAuth } from '@/modules/auth/AuthContext';
 type PostModalProps = {
   isOpenModal: boolean;
   onCloseModal: VoidFunction;
-  selectedPost: Post;
-  authorUsername: string | null | undefined;
-  authorAvatarUrl: string | null | undefined;
+  selectedPost: any;
   meUsername: string | null | undefined;
 };
 
-type Post = {
+export type Post = {
   node: {
     id: string;
-    description: string;
+    description: string | null | undefined;
     imageUrl: string;
     comments_count: number;
     likes_count: number;
     liked_by_viewer: boolean;
     createdAt: string | null;
     comments: any;
+    user: {
+      username: string | null | undefined;
+      avatarUrl: string | null | undefined;
+    };
   } | null;
 } | null;
 
@@ -74,11 +76,9 @@ export const PostModal = ({
   isOpenModal,
   onCloseModal,
   selectedPost,
-  authorUsername,
-  authorAvatarUrl,
   meUsername
 }: PostModalProps) => {
-  const [post, setPost] = useState<Post>(selectedPost);
+  const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<CommentType[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const { isLoggedIn } = useAuth();
@@ -98,9 +98,12 @@ export const PostModal = ({
     useMutation<ModalCommentPostMutationType>(ModalCommentPostMutation);
 
   useEffect(() => {
+    if (!selectedPost || post) return;
     setPost(selectedPost);
-    setComments(selectedPost?.node?.comments.edges);
-  }, [selectedPost]);
+
+    if (!selectedPost?.node?.comments) return;
+    setComments(selectedPost.node.comments.edges);
+  }, [post, selectedPost]);
 
   const handleLikeButton = () => {
     if (!isLoggedIn) {
@@ -173,8 +176,13 @@ export const PostModal = ({
     });
   };
 
+  const onCloseModalCustom = useCallback(() => {
+    setPost(null);
+    onCloseModal();
+  }, [onCloseModal]);
+
   return (
-    <Modal size="5xl" isOpen={isOpenModal} onClose={onCloseModal}>
+    <Modal size="5xl" isOpen={isOpenModal} onClose={onCloseModalCustom}>
       <ModalOverlay>
         <ModalCloseButton size="lg" color="white" />
       </ModalOverlay>
@@ -211,7 +219,7 @@ export const PostModal = ({
               <Flex h="100%" px="15px" align="center" justify="space-between">
                 <Flex align="center">
                   <Avatar
-                    src={authorAvatarUrl ?? undefined}
+                    src={post?.node?.user.avatarUrl ?? undefined}
                     size="xs"
                     mr="15px"
                   />
@@ -222,10 +230,10 @@ export const PostModal = ({
                     transition="ease-in 0.1s"
                     _hover={{ color: 'blackAlpha.500' }}
                   >
-                    {authorUsername}
+                    {post?.node?.user.username}
                   </Text>
                 </Flex>
-                {authorUsername == meUsername && (
+                {post?.node?.user.username == meUsername && (
                   <>
                     <DotsThreeOutline
                       size={15}
@@ -262,8 +270,8 @@ export const PostModal = ({
                   }}
                 >
                   <Comment
-                    avatar={authorUsername}
-                    username={authorUsername}
+                    avatar={post?.node?.user.avatarUrl}
+                    username={post?.node?.user.username}
                     content={post?.node?.description}
                     createdAt={post?.node?.createdAt}
                     onCloseModal={onCloseModal}

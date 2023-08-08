@@ -111,10 +111,23 @@ export const PostGrid = ({ GetUserQuery, me }: PostGridProps) => {
       </Grid>
       <PostModal
         isOpenModal={isOpen}
-        onCloseModal={onClose}
-        selectedPost={post}
-        authorUsername={data?.username}
-        authorAvatarUrl={data?.avatarUrl}
+        onCloseModal={() => {
+          setPost(null);
+          onClose();
+        }}
+        selectedPost={
+          post
+            ? {
+                node: {
+                  ...post.node,
+                  user: {
+                    username: data?.username,
+                    avatarUrl: data?.avatarUrl
+                  }
+                }
+              }
+            : null
+        }
         meUsername={meData?.username}
       />
     </>
