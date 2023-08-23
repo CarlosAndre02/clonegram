@@ -15,6 +15,7 @@ const ProfileEditPage = lazy(
 const TimelinePage = lazy(
   () => import('@/modules/timeline/pages/TimelinePage/TimelinePage')
 );
+const LogoutComponent = lazy(() => import('@/shared/LogoutComponent'));
 
 export const AppRoutes = () => (
   <Routes>
@@ -25,6 +26,7 @@ export const AppRoutes = () => (
     <Route element={<PrivateRoute />}>
       <Route path="/profile/edit" element={<ProfileEditPage />} />
       <Route path="/home" element={<TimelinePage />} />
+      <Route path="/logout" element={<LogoutComponent />} />
     </Route>
     <Route path="/:username" element={<ProfilePage />} />
   </Routes>
