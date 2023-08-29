@@ -38,6 +38,30 @@ export const followUser = async (
   return { follower, followee };
 };
 
+export const followUserByUsername = async (
+  followerId: string,
+  followeeUsername: string
+): Promise<{ follower: UserDocument; followee: UserDocument }> => {
+  const followee = await getUserByUsername(followeeUsername);
+  if (!followee) throw new BadRequestError('User does not exist');
+
+  const follower = await UserModel.findOneAndUpdate(
+    { _id: followerId },
+    { $addToSet: { following: followee.id } },
+    { new: true }
+  );
+  if (!follower) throw new BadRequestError('User does not exist');
+
+  const followeeUpdated = await UserModel.findOneAndUpdate(
+    { _id: followee.id },
+    { $addToSet: { followers: followerId } },
+    { new: true }
+  );
+  if (!followeeUpdated) throw new BadRequestError('User does not exist');
+
+  return { follower, followee: followeeUpdated };
+};
+
 export const unfollowUser = async (
   followerId: string,
   followeeId: string
