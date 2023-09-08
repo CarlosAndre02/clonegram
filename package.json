@@ -16,7 +16,9 @@
   },
   "scripts": {
     "dev:web": "yarn workspace web dev",
-    "dev:server": "yarn workspace server dev"
+    "dev:server": "yarn workspace server dev",
+    "start:server": "yarn workspace server start",
+    "build:server": "yarn workspace server build"
   },
   "devDependencies": {
     "@types/node": "^18.7.18",
