@@ -14,6 +14,9 @@ import { ExecutionResult, GraphQLError } from 'graphql';
 import { schema } from './schema/schema';
 import { getContext } from './utils/getContext';
 
+// import { seedDB } from './config/seedDB';
+// seedDB();
+
 const formatResult = (result: ExecutionResult) => {
   const formattedResult: ExecutionResult = {
     data: result.data

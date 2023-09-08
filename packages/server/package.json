@@ -6,12 +6,11 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "dev": "nodemon",
-    "start": "yarn build && node dist/index.js",
+    "start": "node dist/index.js",
     "schema": "ts-node scripts/updateSchema.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
-    "@types/graphql-upload": "^8.0.12",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/koa": "^2.13.5",
     "@types/koa-bodyparser": "^4.3.8",
@@ -25,7 +24,7 @@
   "dependencies": {
     "@entria/graphql-mongo-helpers": "^1.1.2",
     "@koa/cors": "^3.4.1",
-    "aws-sdk": "^2.1267.0",
+    "aws-sdk": "^2.1450.0",
     "bcrypt": "^5.1.0",
     "dataloader": "^2.1.0",
     "dayjs": "^1.11.7",
@@ -38,6 +37,6 @@
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "module-alias": "^2.2.2",
-    "mongoose": "^6.6.5"
+    "mongoose": "^7.5.0"
   }
 }

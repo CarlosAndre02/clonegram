@@ -47,7 +47,7 @@ export const deletePost = async (
   if (post?.user.toString() !== user)
     throw new BadRequestError('You are unauthorized to delete this post');
 
-  await post.delete();
+  await post.deleteOne();
 
   return post;
 };
