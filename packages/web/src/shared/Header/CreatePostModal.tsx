@@ -202,7 +202,7 @@ const UploadPhotoStep = ({
     <VStack spacing="4">
       <input {...getInputProps()} />
       <Image src={createPostImage} />
-      <Text>Arraste as fotos e os vídeos aqui</Text>
+      <Text>Arraste as fotos aqui</Text>
       <Button
         w="80%"
         bg="#0095f6"
