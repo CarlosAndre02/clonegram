@@ -204,7 +204,7 @@ const UploadPhotoStep = ({
       <Image src={createPostImage} />
       <Text>Arraste as fotos aqui</Text>
       <Button
-        w="80%"
+        w="100%"
         bg="#0095f6"
         color="white"
         size="xs"
