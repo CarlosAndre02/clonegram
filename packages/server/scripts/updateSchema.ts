@@ -8,7 +8,7 @@ import { schema } from '../src/schema/schema';
 
 (async () => {
   await fs.writeFile(
-    path.resolve(__dirname, '..', '..', '..', 'schema.graphql'),
+    path.resolve(__dirname, '..', '..', '..', 'packages', 'web', 'schema.graphql'),
     printSchema(schema)
   );
 })();
