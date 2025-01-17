@@ -49,12 +49,17 @@ git clone https://github.com/CarlosAndre02/clonegram.git
 yarn install
 ```
 
-4. Run the server
+4. Compile relay documents
+```
+yarn relay
+```
+
+5. Run the server
 ```
 yarn dev:server
 ```
 
-5. Now, run the wep app
+6. Now, run the wep app
 ```
 yarn dev:web
 ```
