@@ -3,7 +3,6 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 
 import { UserModel } from '../UserModel';
 import { UserType } from '../UserType';
-import { followUserByUsername } from '../UserService';
 import { authenticateUser } from '@/modules/auth/AuthService';
 import { AuthType } from '@/modules/auth/AuthType';
 
@@ -46,10 +45,6 @@ export const CreateUserMutation = mutationWithClientMutationId({
     }).save();
 
     const authenticatedUser = await authenticateUser(user.id);
-
-    followUserByUsername(user.id, 'ronaldo');
-    followUserByUsername(user.id, 'messi');
-    followUserByUsername(user.id, 'neymar');
 
     return {
       user,
